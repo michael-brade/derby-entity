@@ -1,0 +1,72 @@
+<index:>
+    <div class="{{@entity}}" id="{{_page.entity.id}}">
+
+        <div class="row">
+
+            <table class="table table-condensed table-hover col-md-6">
+                <thead>
+                    <tr>
+                        {{each _page.entity.attributes as #col}}
+                            <th>{{#col.id}}</th>
+                        {{/each}}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {{each _page.list as #item, #index}}
+                        <tr on-click="select(#item.id)">
+                            {{each _page.entity.attributes as #col}}
+                                <td>{{#item[#col.id]}}</td>
+                            {{/each}}
+                            <td>
+                                <span class="glyphicon glyphicon-remove" on-click="remove(#item.id)"></span>
+                            </td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+
+        </div>
+
+
+
+
+        <h3>Add/Edit {{_page.entity.id}}</h3>
+
+        <form role="form" class="form-inline" on-submit="addNewEntity(this)">
+
+            {{each _page.entity.attributes as #field}}
+                <div class="form-group">
+                    {{if #field.type == "entity"}}
+                        <d-select2 label="{{#field.id}}" items="{{_page.comboBoxStringArrayData}}" value="{{#field.path}}"/>
+                    {{else}}
+                        <label for="{{#field.id}}" class="control-label">
+                            {{ #field.id }}
+                            <!-- {{ t( {{_page.entity.id}}.{{#field.id}} ) }} -->
+                        </label>
+                        <input id="{{#field.id}}" class="form-control" type="{{#field.type}}" value="{{#field.path}}">
+                    {{/}}
+                </div>
+            {{/each}}
+
+            <button type="submit" class="btn btn-default col-md-2 col-md-offset-9">Add/Save {{_page.entity.id}}</button>
+        </form>
+
+
+  </div>
+
+
+
+
+
+<field: element="field">
+  <div class="form-group col-md-6">
+    <label for="{{@id}}" class="col-md-4 control-label">{{@label}}</label>
+    <div class="col-md-8">
+    {{if @content}}
+      {{@content}}
+    {{else}}
+      <input id="{{@id}}" class="form-control" type="{{@type}}" value="{{@value}}">
+    {{/if}}
+    </div>
+  </div>
