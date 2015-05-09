@@ -31,25 +31,26 @@
 
 
 
-        <h3>Add/Edit {{_page.entity.id}}</h3>
+        <h3>Add {{_page.entity.id}}</h3>
 
         <form role="form" class="form-inline" on-submit="addNewEntity(this)">
 
             {{each _page.entity.attributes as #field}}
                 <div class="form-group">
                     {{if #field.type == "entity"}}
-                        <d-select2 label="{{#field.id}}" items="{{_page.comboBoxStringArrayData}}" value="{{#field.path}}"/>
+                        <d-select2 label="{{#field.id}}" items="{{_page.comboBoxStringArrayData}}" value="{{_page.newEntity[#field.id]}}"/>
                     {{else}}
-                        <label for="{{#field.id}}" class="control-label">
-                            {{ #field.id }}
-                            <!-- {{ t( {{_page.entity.id}}.{{#field.id}} ) }} -->
-                        </label>
-                        <input id="{{#field.id}}" class="form-control" type="{{#field.type}}" value="{{#field.path}}">
+                        {{with _page.newEntity}} <!-- OR a variable holding either _page or the item? OR call a view with parameter in if/else OR store selected item in newEntity -->
+                            <label for="{{#field.id}}" class="control-label">
+                                {{ t( _page.entity.id + "." + #field.id ) }}
+                            </label>
+                            <input id="{{#field.id}}" class="form-control" type="{{#field.type}}" value="{{ this[#field.id] }}">
+                        {{/}}
                     {{/}}
                 </div>
             {{/each}}
 
-            <button type="submit" class="btn btn-default col-md-2 col-md-offset-9">Add/Save {{_page.entity.id}}</button>
+            <button type="submit" class="btn btn-default col-md-2 col-md-offset-9">Add {{_page.entity.id}}</button>
         </form>
 
 

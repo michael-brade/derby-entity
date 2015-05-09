@@ -10,14 +10,23 @@ export class Entity
 
     # called on the server and the client before rendering
     init: (model) !->
-        #console.log("Entity: init")
-        #model.set("_page.entities", @app.entities)
+        console.log("Entity.init: ", @getAttribute("entity"))
 
         model.set("_page.entity", _.find(@app.entities, (item) ~>
             item.id == @getAttribute("entity")))
 
-        # make entities available sorted in the local model as e.g. "bijas"
-        model.ref(@getAttribute("entity"), model.root.sort(@getAttribute("entity"), nameAscending))
+        # the list of entity instances to be displayed
+        @list = model.at('_page.list')
+
+        ## make entities available sorted in the local model as e.g. "bijas"
+        #model.ref(@getAttribute("entity"), model.root.sort(@getAttribute("entity"), nameAscending))
+        #
+        # alternative:
+        #   @entityData = model.scope(@getAttribute("entity"))
+        # (or @entityTable = ...)
+
+        @newEntity = model.at('_page.newEntity')
+
 
         function nameAscending(a, b)
             aName = (a && a.name || '').toLowerCase()
@@ -47,9 +56,8 @@ export class Entity
     create: (model, dom) ->
 
         # prefill the fields
-        #model.set('_page.comboBoxStringArrayData', <[Item1, Item2, Item3, Item4]>)
+        model.set('_page.comboBoxStringArrayData', <[Item1, Item2, Item3, Item4]>)
 
-        @newTodo = model.at('_page.newEntity')
 
 
 
@@ -60,7 +68,7 @@ export class Entity
      *   - remove client libraries
      */
     destroy: (model, dom) ->
-        console.log("Entity: destroy")
+        console.log("Entity.destroy: ", @getAttribute("entity"))
 
 
 
@@ -69,21 +77,22 @@ export class Entity
 
     /* Add a new Entity.
      *
-     * When called as "addNewEntity(this)" from the view, "entity" will be the object with the current values,
+     * When called as "addNewEntity(this)" from the view, "entity" will be the object with the current model data (values),
      * which is the same as this.model.data
      */
     addNewEntity: (entity) ->
 
         model = this.model
+        # entity == model.data
 
-        console.log("Entity: addNew: ", (entity == model.data))
-        console.log(entity)
+        newEntity = @newEntity.get!
+        @newEntity.del!
 
+        console.log("newEntity:", newEntity)
+        #console.log("userid " + @model.root.get('_session.userId'))
 
-        @emit("addEntity", entity) # or: model.data
+        @list.push(newEntity)
 
-
-
-        console.log("userid " + @model.root.get('_session.userId'))
-
-        model.toast('success', 'New <Entity> added.');
+        @emit("addedEntity", newEntity)
+        @emit("added" + @getAttribute("entity"), newEntity)
+        model.toast('success', 'New <Entity> added.')
