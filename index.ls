@@ -12,20 +12,17 @@ export class Entity
     init: (model) !->
         console.log("Entity.init: ", @getAttribute("entity"))
 
+        # @app.entities is access to all entity types, _page.entity is the currently displayed entity type
         model.set("_page.entity", _.find(@app.entities, (item) ~>
             item.id == @getAttribute("entity")))
 
-        # the list of entity instances to be displayed
-        @list = model.at('_page.list')
-
-        ## make entities available sorted in the local model as e.g. "bijas"
-        #model.ref(@getAttribute("entity"), model.root.sort(@getAttribute("entity"), nameAscending))
-        #
-        # alternative:
-        #   @entityData = model.scope(@getAttribute("entity"))
-        # (or @entityTable = ...)
-
         @newEntity = model.at('_page.newEntity')
+
+        # the list of entity instances to be displayed
+        @list = model.root.at(@getAttribute("entity"))
+
+        ## make entities available sorted in the local model as "_page.list"
+        model.ref('_page.list', @list.sort(nameAscending))
 
 
         function nameAscending(a, b)
@@ -38,7 +35,6 @@ export class Entity
             return 0
 
 
-    # @app.entities is access to all
 
 
     /* Only called on the client before rendering.
@@ -85,14 +81,13 @@ export class Entity
         model = this.model
         # entity == model.data
 
-        newEntity = @newEntity.get!
-        @newEntity.del!
+        newEntity = @newEntity.del!
 
-        console.log("newEntity:", newEntity)
+        #console.log("newEntity:", newEntity)
         #console.log("userid " + @model.root.get('_session.userId'))
 
-        @list.push(newEntity)
+        @list.add(newEntity) if newEntity
 
         @emit("addedEntity", newEntity)
         @emit("added" + @getAttribute("entity"), newEntity)
-        model.toast('success', 'New <Entity> added.')
+        model.toast('success', 'New <Entity> ' + newEntity.name + ' added.')
