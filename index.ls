@@ -16,7 +16,7 @@ export class Entity
         model.set("_page.entity", _.find(@app.entities, (item) ~>
             item.id == @getAttribute("entity")))
 
-        @newEntity = model.at('_page.newEntity')
+        @item = model.at('_page.item')
 
         # the list of entity instances to be displayed
         @list = model.root.at(@getAttribute("entity"))
@@ -54,7 +54,8 @@ export class Entity
         # prefill the fields
         model.set('_page.comboBoxStringArrayData', <[Item1, Item2, Item3, Item4]>)
 
-
+        #dom.on 'click', (e) ->
+        #    @deselect unless @table.contains(e.target)
 
 
     /* Called when leaving the "page".
@@ -70,24 +71,43 @@ export class Entity
 
     # The following functions can be called from the view
 
+    items: (entityId) ->
+        console.log "items for: ", entityId
 
-    /* Add a new Entity.
+
+    /* Add a new entity.
      *
-     * When called as "addNewEntity(this)" from the view, "entity" will be the object with the current model data (values),
+     * When called as "add(this)" from the view, "entity" will be the object with the current model data,
      * which is the same as this.model.data
      */
-    addNewEntity: (entity) ->
-
-        model = this.model
-        # entity == model.data
-
-        newEntity = @newEntity.del!
-
-        #console.log("newEntity:", newEntity)
+    add: (entity) !->
+        # entity == this.model.data
         #console.log("userid " + @model.root.get('_session.userId'))
 
-        @list.add(newEntity) if newEntity
+        if !(newItem = @item.get!) || newItem.id  # add only if exists and not new yet
+            @deselect!
+            return
 
-        @emit("addedEntity", newEntity)
-        @emit("added" + @getAttribute("entity"), newEntity)
-        model.toast('success', 'New <Entity> ' + newEntity.name + ' added.')
+        @list.add(newItem)
+        console.log("add: ", newItem.id)
+
+        @emit("addedEntity", newItem)
+        @emit("added" + @getAttribute("entity"), newItem)
+        @model.toast('success', 'New <Entity> ' + newItem.name + ' added.')
+
+    select: (id) ->
+        if @item.get("id") == id   # if id is already selected, deselect
+            @deselect!
+        else
+            @item.ref(@list.at(id))
+
+    deselect: ->
+        @item.removeRef!
+
+    remove: (id) ->
+        console.log("remove: ", id)
+        @list.del(id)
+
+    cancel: ->
+        @deselect!
+        #this.app.history.back!

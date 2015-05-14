@@ -2,19 +2,19 @@
     <div class="{{@entity}}" id="{{_page.entity.id}}">
 
         <div class="row">
-
             <table class="table table-condensed table-hover col-md-6">
                 <thead>
                     <tr>
                         {{each _page.entity.attributes as #col}}
-                            <th>{{#col.id}}</th>
+                            <th>{{t(_page.entity.id + '.' + #col.id)}}</th>
                         {{/each}}
+                        <th>{{t('actions')}}</th>
                     </tr>
                 </thead>
 
                 <tbody>
                     {{each _page.list as #item, #index}}
-                        <tr on-click="select(#item.id)">
+                        <tr class="{{if #item === _page.item}}active selected{{/}}" on-click="select(#item.id)">
                             {{each _page.entity.attributes as #col}}
                                 <td>{{#item[#col.id]}}</td>
                             {{/each}}
@@ -25,34 +25,55 @@
                     {{/each}}
                 </tbody>
             </table>
-
         </div>
 
 
-
-
-        <h3>Add {{_page.entity.id}}</h3>
-
-        <form role="form" class="form-inline" on-submit="addNewEntity(this)">
-
-            {{each _page.entity.attributes as #field}}
-                <div class="form-group">
-                    {{if #field.type == "entity"}}
-                        <d-select2 label="{{#field.id}}" items="{{_page.comboBoxStringArrayData}}" value="{{_page.newEntity[#field.id]}}"/>
+        <div class="row">
+            {{if _page.item}}
+                <h3>
+                    {{if _page.item.id}}
+                        {{t('actions.edit')}}
                     {{else}}
-                        {{with _page.newEntity}} <!-- OR a variable holding either _page or the item? OR call a view with parameter in if/else OR store selected item in newEntity -->
-                            <label for="{{#field.id}}" class="control-label">
-                                {{ t( _page.entity.id + "." + #field.id ) }}
-                            </label>
-                            <input id="{{#field.id}}" class="form-control" type="{{#field.type}}" value="{{ this[#field.id] }}">
-                        {{/}}
+                        {{t('actions.add')}} {{t(_page.entity.id)}}
                     {{/}}
-                </div>
-            {{/each}}
+                </h3>
 
-            <button type="submit" class="btn btn-default col-md-2 col-md-offset-9">Add {{_page.entity.id}}</button>
-        </form>
+                <form role="form" class="well form-inline" on-submit="add(this)">
 
+                    {{each _page.entity.attributes as #field}}
+                        <div class="form-group">
+                            {{if #field.type == "entity"}}
+                                <d-select2 label="{{#field.id}}" items="{{items(_page.entity.id + '.' + #field.id)}}" value="{{_page.item[#field.id]}}"/>
+                            {{else}}
+                                <label for="{{#field.id}}" class="control-label">
+                                    {{t(_page.entity.id + "." + #field.id)}}
+                                </label>
+                                <input id="{{#field.id}}" class="form-control" type="{{#field.type}}" value="{{_page.item[#field.id]}}">
+                            {{/}}
+                        </div>
+                    {{/each}}
+
+                    <div class="row">
+                        <button type="submit" class="btn btn-default col-md-offset-10">
+                            {{if _page.item.id}}
+                                {{t('actions.done')}}
+                            {{else}}
+                                {{t('actions.add')}}
+                            {{/}}
+                        </button>
+                        {{unless _page.item.id}}
+                            <button type="button" class="btn btn-link" on-click="cancel()">
+                                {{t('actions.cancel')}}
+                            </button>
+                        {{/}}
+                    </div>
+                </form>
+            {{else}}
+                <button type="button" class="btn btn-default col-md-offset-10">
+                    {{t('actions.new')}}
+                </button>
+            {{/}}
+        </div>
 
   </div>
 
