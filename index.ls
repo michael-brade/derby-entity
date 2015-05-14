@@ -112,9 +112,11 @@ export class Entity
             @deselect!
         else
             @item.ref(@list.at(id)) # otherwise @item points to the selected item
+            @app.history.push(@app.pathFor(@getAttribute("entity").id, id))
 
     deselect: ->
         @item.removeRef!
+        @app.history.push(@app.pathFor(@getAttribute("entity").id))
 
     remove: (id) ->
         console.log("remove: ", id)
@@ -122,4 +124,4 @@ export class Entity
 
     cancel: ->
         @deselect!
-        @app.history.back!
+        @app.history.push(@app.pathFor(@getAttribute("entity").id))
