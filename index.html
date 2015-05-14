@@ -8,7 +8,7 @@
                         {{each entity.attributes as #col}}
                             <th>{{t(entity.id + '.' + #col.id)}}</th>
                         {{/each}}
-                        <th>{{t('actions')}}</th>
+                        <th>{{t('actions.title')}}</th>
                     </tr>
                 </thead>
 
@@ -30,13 +30,13 @@
 
         <div class="row">
             {{if item}}
-                <h3>
+                <legend>
                     {{if item.id}}
-                        {{t('actions.edit')}}
+                        {{t('actions.edit')}} {{t(entity.id + '.one')}}
                     {{else}}
-                        {{t('actions.add')}} {{t(entity.id)}}
+                        {{t('actions.add')}} {{t(entity.id + '.one')}}
                     {{/}}
-                </h3>
+                </legend>
 
                 <form role="form" class="well form-inline" on-submit="add(this)">
 
@@ -70,7 +70,7 @@
                 </form>
             {{else}}
                 <a class="btn btn-lg btn-primary btn-default col-md-offset-10" href="{{pathFor(entity.id, 'new')}}" role="button">
-                    {{t('actions.new')}}
+                    {{ t('actions.new', { 'ITEM': t(entity.id + '.one') }) }}
                 </a>
             {{/}}
         </div>
