@@ -3,6 +3,15 @@ _ = require 'lodash'  # use prelude.ls ?
 # Display one entity with a table listing all instances on the left and
 # the attibutes of a selected entity on the right.
 #
+# view parameters:
+#  * item - either a new item (empty Object), no item (null), or points to the currently selected item
+#
+#  * entity - the entity definition object
+#
+# Parameters are accessible by
+#   @getAttribute("entity")
+# or
+#   @model.get("entity")
 export class Entity
 
     view: __dirname
@@ -10,20 +19,13 @@ export class Entity
 
     # called on the server and the client before rendering
     init: (model) !->
-        console.log("Entity.init: ", @getAttribute("entity"))
-
-        # @app.entities is access to all entity types, _page.entity is the currently displayed entity type
-        model.set("_page.entity", _.find(@app.entities, (item) ~>
-            item.id == @getAttribute("entity")))
-
-        @item = model.at('_page.item')
+        @item = model.at('item')
 
         # the list of entity instances to be displayed
-        @list = model.root.at(@getAttribute("entity"))
+        @list = model.root.at(@getAttribute("entity").id)
 
         ## make entities available sorted in the local model as "_page.list"
         model.ref('_page.list', @list.sort(nameAscending))
-
 
         function nameAscending(a, b)
             aName = (a && a.name || '').toLowerCase()
@@ -37,7 +39,7 @@ export class Entity
 
 
 
-    /* Only called on the client before rendering.
+    /* Only called on the client before rendering. It is possible to use jQuery in here.
      *
      *  "this" (Entity) has:
      *   - context (Context)
@@ -50,6 +52,7 @@ export class Entity
      *  this.app.model is global model
      */
     create: (model, dom) ->
+        console.log("Entity.create: ", @getAttribute("entity").id)
 
         # prefill the fields
         model.set('_page.comboBoxStringArrayData', <[Item1, Item2, Item3, Item4]>)
@@ -65,7 +68,7 @@ export class Entity
      *   - remove client libraries
      */
     destroy: (model, dom) ->
-        console.log("Entity.destroy: ", @getAttribute("entity"))
+        console.log("Entity.destroy: ", @getAttribute("entity").id)
 
 
 
@@ -84,22 +87,31 @@ export class Entity
         # entity == this.model.data
         #console.log("userid " + @model.root.get('_session.userId'))
 
-        if !(newItem = @item.get!) || newItem.id  # add only if exists and not new yet
+        if !(newItem = @item.get!) || newItem.id  # add only if exists and not in db yet
             @deselect!
             return
+
+        @item.del! # TODO: is this needed??
 
         @list.add(newItem)
         console.log("add: ", newItem.id)
 
         @emit("addedEntity", newItem)
-        @emit("added" + @getAttribute("entity"), newItem)
+        @emit("added" + @getAttribute("entity").id, newItem)
+
+        # TODO: use t() with parameters for this string!
         @model.toast('success', 'New <Entity> ' + newItem.name + ' added.')
 
+        # Wait for all model changes to go through before going to the next page, mainly because
+        # in non-single-page-app mode (basically IE < 10) we want changes to save to the server before leaving the page
+        @model.whenNothingPending ~>
+            @app.history.push(@app.pathFor(@getAttribute("entity").id))
+
     select: (id) ->
-        if @item.get("id") == id   # if id is already selected, deselect
+        if @item.get("id") == id    # if id is already selected, deselect
             @deselect!
         else
-            @item.ref(@list.at(id))
+            @item.ref(@list.at(id)) # otherwise @item points to the selected item
 
     deselect: ->
         @item.removeRef!
@@ -110,4 +122,4 @@ export class Entity
 
     cancel: ->
         @deselect!
-        #this.app.history.back!
+        @app.history.back!

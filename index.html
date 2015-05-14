@@ -1,12 +1,12 @@
 <index:>
-    <div class="{{@entity}}" id="{{_page.entity.id}}">
+    <div class="{{@entity.id}}" id="{{entity.id}}">
 
-        <div class="row">
+        <div class="row table-responsive">
             <table class="table table-condensed table-hover col-md-6">
                 <thead>
                     <tr>
-                        {{each _page.entity.attributes as #col}}
-                            <th>{{t(_page.entity.id + '.' + #col.id)}}</th>
+                        {{each entity.attributes as #col}}
+                            <th>{{t(entity.id + '.' + #col.id)}}</th>
                         {{/each}}
                         <th>{{t('actions')}}</th>
                     </tr>
@@ -15,7 +15,7 @@
                 <tbody>
                     {{each _page.list as #item, #index}}
                         <tr class="{{if #item === _page.item}}active selected{{/}}" on-click="select(#item.id)">
-                            {{each _page.entity.attributes as #col}}
+                            {{each entity.attributes as #col}}
                                 <td>{{#item[#col.id]}}</td>
                             {{/each}}
                             <td>
@@ -29,33 +29,33 @@
 
 
         <div class="row">
-            {{if _page.item}}
+            {{if item}}
                 <h3>
-                    {{if _page.item.id}}
+                    {{if item.id}}
                         {{t('actions.edit')}}
                     {{else}}
-                        {{t('actions.add')}} {{t(_page.entity.id)}}
+                        {{t('actions.add')}} {{t(entity.id)}}
                     {{/}}
                 </h3>
 
                 <form role="form" class="well form-inline" on-submit="add(this)">
 
-                    {{each _page.entity.attributes as #field}}
+                    {{each entity.attributes as #field}}
                         <div class="form-group">
                             {{if #field.type == "entity"}}
-                                <d-select2 label="{{#field.id}}" items="{{items(_page.entity.id + '.' + #field.id)}}" value="{{_page.item[#field.id]}}"/>
+                                <d-select2 label="{{#field.id}}" items="{{items(entity.id + '.' + #field.id)}}" value="{{item[#field.id]}}"/>
                             {{else}}
                                 <label for="{{#field.id}}" class="control-label">
-                                    {{t(_page.entity.id + "." + #field.id)}}
+                                    {{t(entity.id + "." + #field.id)}}
                                 </label>
-                                <input id="{{#field.id}}" class="form-control" type="{{#field.type}}" value="{{_page.item[#field.id]}}">
+                                <input id="{{#field.id}}" class="form-control" type="{{#field.type}}" value="{{item[#field.id]}}">
                             {{/}}
                         </div>
                     {{/each}}
 
                     <div class="row">
                         <button type="submit" class="btn btn-default col-md-offset-10">
-                            {{if _page.item.id}}
+                            {{if item.id}}
                                 {{t('actions.done')}}
                             {{else}}
                                 {{t('actions.add')}}
@@ -69,9 +69,9 @@
                     </div>
                 </form>
             {{else}}
-                <button type="button" class="btn btn-default col-md-offset-10">
+                <a class="btn btn-lg btn-primary btn-default col-md-offset-10" href="{{pathFor(entity.id, 'new')}}" role="button">
                     {{t('actions.new')}}
-                </button>
+                </a>
             {{/}}
         </div>
 
