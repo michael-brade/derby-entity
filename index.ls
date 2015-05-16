@@ -19,6 +19,8 @@ export class Entity
 
     # called on the server and the client before rendering
     init: (model) !->
+        model.ref('$locale', model.root.at('$locale'))
+        
         @item = model.at('item')
 
         # the list of entity instances to be displayed

@@ -6,9 +6,9 @@
                 <thead>
                     <tr>
                         {{each entity.attributes as #col}}
-                            <th>{{t(entity.id + '.' + #col.id)}}</th>
+                            <th>{{t($locale, entity.id + '.' + #col.id)}}</th>
                         {{/each}}
-                        <th>{{t('actions.title')}}</th>
+                        <th>{{t($locale, 'actions.title')}}</th>
                     </tr>
                 </thead>
 
@@ -32,9 +32,9 @@
             {{if item}}
                 <legend>
                     {{if item.id}}
-                        {{t('actions.edit')}} {{t(entity.id + '.one')}}
+                        {{t($locale, 'actions.edit')}} {{t($locale, entity.id + '.one')}}
                     {{else}}
-                        {{t('actions.add')}} {{t(entity.id + '.one')}}
+                        {{t($locale, 'actions.add')}} {{t($locale, entity.id + '.one')}}
                     {{/}}
                 </legend>
 
@@ -46,7 +46,7 @@
                                 <d-select2 label="{{#field.id}}" items="{{items(entity.id + '.' + #field.id)}}" value="{{item[#field.id]}}"/>
                             {{else}}
                                 <label for="{{#field.id}}" class="control-label">
-                                    {{t(entity.id + "." + #field.id)}}
+                                    {{t($locale, entity.id + "." + #field.id)}}
                                 </label>
                                 <input id="{{#field.id}}" class="form-control" type="{{#field.type}}" value="{{item[#field.id]}}">
                             {{/}}
@@ -56,21 +56,21 @@
                     <div class="row">
                         <button type="submit" class="btn btn-default col-md-offset-10">
                             {{if item.id}}
-                                {{t('actions.done')}}
+                                {{t($locale, 'actions.done')}}
                             {{else}}
-                                {{t('actions.add')}}
+                                {{t($locale, 'actions.add')}}
                             {{/}}
                         </button>
                         {{unless _page.item.id}}
                             <button type="button" class="btn btn-link" on-click="cancel()">
-                                {{t('actions.cancel')}}
+                                {{t($locale, 'actions.cancel')}}
                             </button>
                         {{/}}
                     </div>
                 </form>
             {{else}}
                 <a class="btn btn-lg btn-primary btn-default col-md-offset-10" href="{{pathFor(entity.id, 'new')}}" role="button">
-                    {{ t('actions.new', { 'ITEM': t(entity.id + '.one') }) }}
+                    {{ t($locale, 'actions.new', { 'ITEM': t($locale, entity.id + '.one') }) }}
                 </a>
             {{/}}
         </div>
