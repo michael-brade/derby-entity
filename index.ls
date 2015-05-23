@@ -17,10 +17,20 @@ export class Entity
     view: __dirname
     style: __dirname
 
+
+    function nameAscending(a, b)
+        aName = (a && a.name || '').toLowerCase()
+        bName = (b && b.name || '').toLowerCase()
+        if (aName < bName)
+            return -1
+        if (aName > bName)
+            return 1
+        return 0
+
     # called on the server and the client before rendering
     init: (model) !->
         model.ref('$locale', model.root.at('$locale'))
-        
+
         @item = model.at('item')
 
         # the list of entity instances to be displayed
@@ -28,15 +38,6 @@ export class Entity
 
         ## make entities available sorted in the local model as "_page.list"
         model.ref('_page.list', @list.sort(nameAscending))
-
-        function nameAscending(a, b)
-            aName = (a && a.name || '').toLowerCase()
-            bName = (b && b.name || '').toLowerCase()
-            if (aName < bName)
-                return -1
-            if (aName > bName)
-                return 1
-            return 0
 
 
 
@@ -57,7 +58,6 @@ export class Entity
         console.log("Entity.create: ", @getAttribute("entity").id)
 
         # prefill the fields
-        model.set('_page.comboBoxStringArrayData', <[Item1, Item2, Item3, Item4]>)
 
         #dom.on 'click', (e) ->
         #    @deselect unless @table.contains(e.target)
@@ -75,9 +75,6 @@ export class Entity
 
 
     # The following functions can be called from the view
-
-    items: (entityId) ->
-        console.log "items for: ", entityId
 
 
     /* Add a new entity.

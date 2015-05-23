@@ -43,7 +43,8 @@
                     {{each entity.attributes as #field}}
                         <div class="form-group">
                             {{if #field.type == "entity"}}
-                                <d-select2 label="{{#field.id}}" items="{{items(entity.id + '.' + #field.id)}}" value="{{item[#field.id]}}"/>
+                                <d-select2 label="{{#field.id}}" obj key="id" text="name"
+                                           items="{{#root[#field.entity]}}" value="{{item[#field.id]}}"/>
                             {{else}}
                                 <label for="{{#field.id}}" class="control-label">
                                     {{t($locale, entity.id + "." + #field.id)}}
@@ -69,7 +70,7 @@
                     </div>
                 </form>
             {{else}}
-                <a class="btn btn-lg btn-primary btn-default col-md-offset-10" href="{{pathFor(entity.id, 'new')}}" role="button">
+                <a class="btn btn-sm btn-primary btn-default col-md-offset-10" href="{{pathFor(entity.id, 'new')}}" role="button">
                     {{ t($locale, 'actions.new', { 'ITEM': t($locale, entity.id + '.one') }) }}
                 </a>
             {{/}}
