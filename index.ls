@@ -123,4 +123,3 @@ export class Entity
 
     cancel: ->
         @deselect!
-        @app.history.push(@app.pathFor(@getAttribute("entity").id))
