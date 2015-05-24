@@ -16,7 +16,15 @@
                     {{each _page.list as #item, #index}}
                         <tr class="{{if #item === _page.item}}active selected{{/}}" on-click="select(#item.id)">
                             {{each entity.attributes as #col}}
-                                <td>{{#item[#col.id]}}</td>
+                                <td>
+                                    {{if #col.type == "entity"}}
+                                        {{each #item[#col.id] as #subitem}}
+                                            {{#subitem.name}} &sp;
+                                        {{/each}}
+                                    {{else}}
+                                        {{#item[#col.id]}}
+                                    {{/}}
+                                </td>
                             {{/each}}
                             <td>
                                 <span class="glyphicon glyphicon-remove" on-click="remove(#item.id)"></span>
@@ -43,7 +51,7 @@
                     {{each entity.attributes as #field}}
                         <div class="form-group">
                             {{if #field.type == "entity"}}
-                                <d-select2 label="{{#field.id}}" obj key="id" text="name"
+                                <d-select2 label="{{#field.id}}" fixed obj key="id" text="name"
                                            items="{{#root[#field.entity]}}" value="{{item[#field.id]}}"/>
                             {{else}}
                                 <label for="{{#field.id}}" class="control-label">
