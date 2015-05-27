@@ -39,7 +39,14 @@ export class Entity
         ## make the items available sorted in the local model
         model.ref('_page.items', @list.sort(nameAscending))
 
+        ## change the entities array, as well as the attributes arrays of each entity to a map
+        # important to deep-copy it!
+        entities = _.indexBy(model.getDeepCopy('entities'), (entity) ->
+            entity.attributes = _.indexBy(entity.attributes, 'id')
+            return entity.id
+        )
 
+        model.set('_page.entities', entities)
 
 
     /* Only called on the client before rendering. It is possible to use jQuery in here.

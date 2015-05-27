@@ -18,11 +18,19 @@
                             {{each entity.attributes as #col}}
                                 <td>
                                     {{if #col.type == "entity"}}
-                                        {{each #item[#col.id] as #subitem}}
-                                            {{#subitem.name}} &sp;
-                                        {{/each}}
+                                        {{each #item[#col.id] as #subitem}}  <!-- each of the entity items -->
+                                            {{if typeof #subitem.name === 'object'}}
+                                                {{#subitem.name[$locale]}} &sp;
+                                            {{else}}
+                                                {{#subitem.name}} &sp;
+                                            {{/}}
+                                        {{/}}
                                     {{else}}
-                                        {{#item[#col.id]}}
+                                        {{if typeof #item[#col.id] === 'object'}}
+                                            {{#item[#col.id][l($locale)]}}
+                                        {{else}}
+                                            {{#item[#col.id]}}
+                                        {{/}}
                                     {{/}}
                                 </td>
                             {{/each}}
@@ -47,17 +55,28 @@
                 </legend>
 
                 <form role="form" class="well form-inline" on-submit="add(this)">
-
                     {{each entity.attributes as #field}}
                         <div class="form-group">
                             {{if #field.type == "entity"}}
-                                <d-select2 label="{{#field.id}}" fixed obj key="id" text="name"
+                                <!-- this item could be a new item, so we cannot check for name being an object
+                                     TODO: pass in true if i18n instead, otherwise changing the locale won't have an effect
+                                -->
+                                <d-select2 label="{{#field.id}}" fixed obj key="id" text="name{{if (_page.entities[#field.entity]).attributes.name.i18n}}.{{l($locale)}}{{/if}}"
                                            items="{{#root[#field.entity]}}" value="{{item[#field.id]}}"/>
                             {{else}}
-                                <label for="{{#field.id}}" class="control-label">
-                                    {{t($locale, entity.id + "." + #field.id)}}
-                                </label>
-                                <input id="{{#field.id}}" class="form-control" type="{{#field.type}}" value="{{item[#field.id]}}">
+                                {{if #field.i18n}}
+                                    {{each $locale.supported as #loc}}
+                                        <label for="{{#field.id}}.{{#loc}}" class="control-label">
+                                            {{t($locale, entity.id + "." + #field.id)}} ({{#loc}})
+                                        </label>
+                                        <input id="{{#field.id}}.{{#loc}}" class="form-control" type="{{#field.type}}" value="{{item[#field.id][#loc]}}">
+                                    {{/}}
+                                {{else}}
+                                    <label for="{{#field.id}}" class="control-label">
+                                        {{t($locale, entity.id + "." + #field.id)}}
+                                    </label>
+                                    <input id="{{#field.id}}" class="form-control" type="{{#field.type}}" value="{{item[#field.id]}}">
+                                {{/}}
                             {{/}}
                         </div>
                     {{/each}}
