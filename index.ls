@@ -36,8 +36,8 @@ export class Entity
         # the list of entity instances to be displayed
         @list = model.root.at(@getAttribute("entity").id)
 
-        ## make entities available sorted in the local model as "_page.list"
-        model.ref('_page.list', @list.sort(nameAscending))
+        ## make the items available sorted in the local model
+        model.ref('_page.items', @list.sort(nameAscending))
 
 
 

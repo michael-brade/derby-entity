@@ -13,7 +13,7 @@
                 </thead>
 
                 <tbody>
-                    {{each _page.list as #item, #index}}
+                    {{each _page.items as #item, #index}}
                         <tr class="{{if #item === _page.item}}active selected{{/}}" on-click="select(#item.id)">
                             {{each entity.attributes as #col}}
                                 <td>
