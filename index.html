@@ -56,30 +56,29 @@
 
                 <form role="form" class="well form-inline" on-submit="add(this)">
                     {{each entity.attributes as #field}}
-                        <div class="form-group">
-                            {{if #field.type == "entity"}}
-                                <!-- this item could be a new item, so we cannot check for name being an object
-                                     TODO: pass in true if i18n instead, otherwise changing the locale won't have an effect
-                                -->
-                                <d-select2 label="{{t($locale, entity.id + '.' + #field.id)}}" fixed
-                                           obj key="id" text="name{{if (_page.entities[#field.entity]).attributes.name.i18n}}.{{l($locale)}}{{/if}}"
-                                           items="{{#root[#field.entity]}}" value="{{item[#field.id]}}"/>
-                            {{else}}
-                                {{if #field.i18n}}
-                                    {{each $locale.supported as #loc}}
-                                        <label for="{{#field.id}}.{{#loc}}" class="control-label">
-                                            {{t($locale, entity.id + "." + #field.id)}} ({{#loc}})
-                                        </label>
-                                        <input id="{{#field.id}}.{{#loc}}" class="form-control" type="{{#field.type}}" value="{{item[#field.id][#loc]}}">
-                                    {{/}}
-                                {{else}}
-                                    <label for="{{#field.id}}" class="control-label">
-                                        {{t($locale, entity.id + "." + #field.id)}}
+                        {{if #field.type == "entity"}}
+                            <!-- this item could be a new item, so we cannot check for name being an object
+                                 TODO: pass in true if i18n instead, otherwise changing the locale won't have an effect -->
+                            <d-select2 label="{{t($locale, entity.id + '.' + #field.id)}}" fixed
+                                       obj key="id" text="name{{if (_page.entities[#field.entity]).attributes.name.i18n}}.{{l($locale)}}{{/if}}"
+                                       items="{{#root[#field.entity]}}" value="{{item[#field.id]}}" />
+                        {{else if #field.i18n}}
+                            {{each $locale.supported as #loc}}
+                                <div class="form-group">
+                                    <label for="{{#field.id}}.{{#loc}}" class="control-label">
+                                        {{t($locale, entity.id + "." + #field.id)}} ({{#loc}})
                                     </label>
-                                    <input id="{{#field.id}}" class="form-control" type="{{#field.type}}" value="{{item[#field.id]}}">
-                                {{/}}
+                                    <input id="{{#field.id}}.{{#loc}}" class="form-control" type="{{#field.type}}" value="{{item[#field.id][#loc]}}" />
+                                </div>
                             {{/}}
-                        </div>
+                        {{else}}
+                            <div class="form-group">
+                                <label for="{{#field.id}}" class="control-label">
+                                    {{t($locale, entity.id + "." + #field.id)}}
+                                </label>
+                                <input id="{{#field.id}}" class="form-control" type="{{#field.type}}" value="{{item[#field.id]}}" />
+                            </div>
+                        {{/}}
                     {{/each}}
 
                     <div class="row">
@@ -103,7 +102,7 @@
                 </a>
             {{/}}
         </div>
-  </div>
+    </div>
 
 
 
