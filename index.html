@@ -61,7 +61,8 @@
                                 <!-- this item could be a new item, so we cannot check for name being an object
                                      TODO: pass in true if i18n instead, otherwise changing the locale won't have an effect
                                 -->
-                                <d-select2 label="{{#field.id}}" fixed obj key="id" text="name{{if (_page.entities[#field.entity]).attributes.name.i18n}}.{{l($locale)}}{{/if}}"
+                                <d-select2 label="{{t($locale, entity.id + '.' + #field.id)}}" fixed
+                                           obj key="id" text="name{{if (_page.entities[#field.entity]).attributes.name.i18n}}.{{l($locale)}}{{/if}}"
                                            items="{{#root[#field.entity]}}" value="{{item[#field.id]}}"/>
                             {{else}}
                                 {{if #field.i18n}}
@@ -102,7 +103,6 @@
                 </a>
             {{/}}
         </div>
-
   </div>
 
 
