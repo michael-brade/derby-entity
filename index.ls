@@ -84,9 +84,9 @@ export class Entity
             searching: false
 
             tableTools:
+                aButtons: []        # only use selection features of TableTools
                 sRowSelect: "single"
                 sSelectedClass: "selected active"
-                aButtons: []
                 #fnRowSelected: @select
 
             #scrollY: 300
@@ -95,7 +95,25 @@ export class Entity
             stateSave: true
             stateDuration: 0
 
-            #renderer: "bootstrap"
+            renderer: "bootstrap"
+            responsive:
+                details:
+                    renderer: (api, rowIdx) ->
+                        # Select hidden columns for the given row
+                        data = api.cells(rowIdx, ':hidden').eq(0).map( (cell) ->
+                            header = $(api.column(cell.column).header())
+
+                            return '<tr>' +
+                                       '<td>' +
+                                           header.text() + ':' +
+                                       '</td>' +
+                                       '<td>' +
+                                           api.cell(cell).data() +
+                                       '</td>' +
+                                   '</tr>'
+                        ).toArray().join('');
+
+                        return if data then $('<table/>').append(data) else false
         )
 
         # prefill the fields

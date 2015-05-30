@@ -1,14 +1,16 @@
 <index:>
     <div class="{{@entity.id}}" id="{{entity.id}}">
 
-        <div class="row table-responsive">
-            <table as="table" class="table table-condensed table-hover col-md-6">
+        <div class="row">
+            <table as="table" class="table table-condensed table-hover compact" width="100%">
                 <thead>
                     <tr>
                         {{each entity.attributes as #col}}
                             <th>{{t($locale, entity.id + '.' + #col.id)}}</th>
                         {{/each}}
-                        <th data-orderable="false" data-width="30">{{t($locale, 'actions.title')}}</th>
+
+                        <!-- the Action column is "all"-ways visible -->
+                        <th class="all" data-orderable="false" data-width="30">{{t($locale, 'actions.title')}}</th>
                     </tr>
                 </thead>
 

@@ -1,4 +1,7 @@
-@import "datatables/dataTables.bootstrap.css";
+$open-button-background: #337ab7 !default;
+
+@import "datatables/bootstrap.css";
+@import "datatables/responsive";
 
 .entities {
 }
