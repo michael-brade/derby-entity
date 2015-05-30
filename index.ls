@@ -4,9 +4,10 @@ _ = require 'lodash'  # use prelude.ls ?
 # the attibutes of a selected entity on the right.
 #
 # view parameters:
-#  * item - either a new item (empty Object), no item (null), or points to the currently selected item
+#  * item     - either a new item (empty Object), no item (null), or points to the currently selected item
+#  * entity   - the entity definition object
+#  * entities - all entity definitions
 #
-#  * entity - the entity definition object
 #
 # Parameters are accessible by
 #   @getAttribute("entity")
@@ -66,6 +67,37 @@ export class Entity
     create: (model, dom) ->
         console.log("Entity.create: ", @getAttribute("entity").id)
 
+        # init the table
+        require('datatables')
+        require('datatables.tableTools')
+        require('datatables.responsive')
+        require('datatables.bootstrap')
+
+        # TODO: integrate with model changes (add, del rows, change contents, then update sorting)
+        $(@table).DataTable(
+            autowidth: true    # takes cpu, see also column.width
+            #lenghthChange: false
+
+            dom: "Tt"
+            info: false
+            paging: false
+            searching: false
+
+            tableTools:
+                sRowSelect: "single"
+                sSelectedClass: "selected active"
+                aButtons: []
+                #fnRowSelected: @select
+
+            #scrollY: 300
+            scrollCollapse: true
+
+            stateSave: true
+            stateDuration: 0
+
+            #renderer: "bootstrap"
+        )
+
         # prefill the fields
 
         # if app.history.push() is called with rerender, destroy() and create() are called, but the old listener is never removed!
@@ -81,8 +113,7 @@ export class Entity
      *   - remove client libraries
      */
     destroy: (model, dom) ->
-        console.log("Entity.destroy: ", @getAttribute("entity").id)
-
+        console.log("Entity.destroy: ", @getAttribute("entity").id, dom)
 
 
     # The following functions can be called from the view

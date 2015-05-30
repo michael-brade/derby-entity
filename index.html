@@ -2,13 +2,13 @@
     <div class="{{@entity.id}}" id="{{entity.id}}">
 
         <div class="row table-responsive">
-            <table class="table table-condensed table-hover col-md-6">
+            <table as="table" class="table table-condensed table-hover col-md-6">
                 <thead>
                     <tr>
                         {{each entity.attributes as #col}}
                             <th>{{t($locale, entity.id + '.' + #col.id)}}</th>
                         {{/each}}
-                        <th>{{t($locale, 'actions.title')}}</th>
+                        <th data-orderable="false" data-width="30">{{t($locale, 'actions.title')}}</th>
                     </tr>
                 </thead>
 
@@ -82,7 +82,7 @@
                     {{/each}}
 
                     <div class="row">
-                        <button type="submit" class="btn btn-default col-md-offset-10">
+                        <button type="submit" class="btn btn-primary col-md-offset-10">
                             {{if item.id}}
                                 {{t($locale, 'actions.done')}}
                             {{else}}
@@ -97,7 +97,7 @@
                     </div>
                 </form>
             {{else}}
-                <a class="btn btn-sm btn-primary btn-default col-md-offset-10" href="{{pathFor(entity.id, 'new')}}" role="button">
+                <a class="btn btn-primary col-md-offset-10" href="{{pathFor(entity.id, 'new')}}" role="button">
                     {{ t($locale, 'actions.new', { 'ITEM': t($locale, entity.id + '.one') }) }}
                 </a>
             {{/}}
