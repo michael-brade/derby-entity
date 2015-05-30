@@ -66,8 +66,8 @@ export class Entity
 
         # prefill the fields
 
-        #dom.on 'click', (e) ->
-        #    @deselect unless @table.contains(e.target)
+        # dom.on 'click', (e) ~>
+        #     @deselect! unless @table.contains(e.target)
 
 
     /* Called when leaving the "page".
