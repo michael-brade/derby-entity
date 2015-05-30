@@ -55,7 +55,9 @@ export class Entity
      *   - context (Context)
      *   - model (ChildModel, aka ViewModel)
      *   - model.root (Model, parent/global model)
-     *   - dom (Dom) [on(), once(), addListener(), removeListener()]
+     *   - dom (Dom)
+              on/addListener/once(type, [target=document], listener, useCapture)
+              removeListener()
      *   - app (App) [use for e.g. this.app.history.back()]
      *   - page, parent (AppPage) [e.g. page.redirect('/home')]
      *
@@ -65,6 +67,8 @@ export class Entity
         console.log("Entity.create: ", @getAttribute("entity").id)
 
         # prefill the fields
+
+        # if app.history.push() is called with rerender, destroy() and create() are called, but the old listener is never removed!
 
         # dom.on 'click', (e) ~>
         #     @deselect! unless @table.contains(e.target)
@@ -111,18 +115,18 @@ export class Entity
         # Wait for all model changes to go through before going to the next page, mainly because
         # in non-single-page-app mode (basically IE < 10) we want changes to save to the server before leaving the page
         @model.whenNothingPending ~>
-            @app.history.push(@app.pathFor(@getAttribute("entity").id))
+            @app.history.push(@app.pathFor(@getAttribute("entity").id), false)
 
     select: (id) ->
         if @item.get("id") == id    # if id is already selected, deselect
             @deselect!
         else
             @item.ref(@list.at(id)) # otherwise @item points to the selected item
-            @app.history.push(@app.pathFor(@getAttribute("entity").id, id))
+            @app.history.push(@app.pathFor(@getAttribute("entity").id, id), false)
 
     deselect: ->
         @item.removeRef!
-        @app.history.push(@app.pathFor(@getAttribute("entity").id))
+        @app.history.push(@app.pathFor(@getAttribute("entity").id), false)
 
     remove: (id) ->
         console.log("remove: ", id)
