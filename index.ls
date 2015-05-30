@@ -18,7 +18,7 @@ export class Entity
     view: __dirname
     style: __dirname
 
-
+    # TODO: still needed with datatables?
     function nameAscending(a, b)
         aName = (a && a.name || '').toLowerCase()
         bName = (b && b.name || '').toLowerCase()
@@ -78,7 +78,7 @@ export class Entity
             autowidth: true    # takes cpu, see also column.width
             #lenghthChange: false
 
-            dom: "Tt"
+            dom: "tT"
             info: false
             paging: false
             searching: false
@@ -90,7 +90,7 @@ export class Entity
                 #fnRowSelected: @select
 
             #scrollY: 300
-            scrollCollapse: true
+            #scrollCollapse: true
 
             stateSave: true
             stateDuration: 0
@@ -98,6 +98,7 @@ export class Entity
             renderer: "bootstrap"
             responsive:
                 details:
+                    type: "column"
                     renderer: (api, rowIdx) ->
                         # Select hidden columns for the given row
                         data = api.cells(rowIdx, ':hidden').eq(0).map( (cell) ->
@@ -114,6 +115,13 @@ export class Entity
                         ).toArray().join('');
 
                         return if data then $('<table/>').append(data) else false
+
+            columnDefs:
+                * className: 'control'
+                  targets:   0
+                ...
+
+            order: []
         )
 
         # prefill the fields

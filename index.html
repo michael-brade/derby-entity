@@ -1,111 +1,104 @@
 <index:>
-    <div class="{{@entity.id}}" id="{{entity.id}}">
+    <table as="table" class="table table-condensed table-hover compact" width="100%">
+        <thead>
+            <tr>
+                <th data-orderable="false"></th> <!-- for the child row expansion -->
+                {{each entity.attributes as #col}}
+                    <th>{{t($locale, entity.id + '.' + #col.id)}}</th>
+                {{/each}}
 
-        <div class="row">
-            <table as="table" class="table table-condensed table-hover compact" width="100%">
-                <thead>
-                    <tr>
-                        {{each entity.attributes as #col}}
-                            <th>{{t($locale, entity.id + '.' + #col.id)}}</th>
-                        {{/each}}
+                <!-- the Action column is "all"-ways visible -->
+                <th class="all" data-orderable="false" data-width="30">{{t($locale, 'actions.title')}}</th>
+            </tr>
+        </thead>
 
-                        <!-- the Action column is "all"-ways visible -->
-                        <th class="all" data-orderable="false" data-width="30">{{t($locale, 'actions.title')}}</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {{each _page.items as #item, #index}}
-                        <tr class="{{if #item === _page.item}}active selected{{/}}" on-click="select(#item.id)">
-                            {{each entity.attributes as #col}}
-                                <td>
-                                    {{if #col.type == "entity"}}
-                                        {{each #item[#col.id] as #subitem}}  <!-- each of the entity items -->
-                                            {{if typeof #subitem.name === 'object'}}
-                                                {{#subitem.name[$locale]}} &sp;
-                                            {{else}}
-                                                {{#subitem.name}} &sp;
-                                            {{/}}
-                                        {{/}}
+        <tbody>
+            {{each _page.items as #item, #index}}
+                <tr class="{{if #item === _page.item}}active selected{{/}}" on-click="select(#item.id)">
+                    <td></td> <!-- for the child row expansion -->
+                    {{each entity.attributes as #col}}
+                        <td>
+                            {{if #col.type == "entity"}}
+                                {{each #item[#col.id] as #subitem}}  <!-- each of the entity items -->
+                                    {{if typeof #subitem.name === 'object'}}
+                                        {{#subitem.name[$locale]}} &sp;
                                     {{else}}
-                                        {{if typeof #item[#col.id] === 'object'}}
-                                            {{#item[#col.id][l($locale)]}}
-                                        {{else}}
-                                            {{#item[#col.id]}}
-                                        {{/}}
+                                        {{#subitem.name}} &sp;
                                     {{/}}
-                                </td>
-                            {{/each}}
-                            <td>
-                                <span class="glyphicon glyphicon-remove" on-click="remove(#item.id)"></span>
-                            </td>
-                        </tr>
-                    {{/each}}
-                </tbody>
-            </table>
-        </div>
-
-
-        <div class="row">
-            {{if item}}
-                <legend>
-                    {{if item.id}}
-                        {{t($locale, 'actions.edit')}} {{t($locale, entity.id + '.one')}}
-                    {{else}}
-                        {{t($locale, 'actions.add')}} {{t($locale, entity.id + '.one')}}
-                    {{/}}
-                </legend>
-
-                <form role="form" class="well form-inline" on-submit="add(this)">
-                    {{each entity.attributes as #field}}
-                        {{if #field.type == "entity"}}
-                            <!-- this item could be a new item, so we cannot check for name being an object
-                                 TODO: pass in true if i18n instead, otherwise changing the locale won't have an effect -->
-                            <d-select2 label="{{t($locale, entity.id + '.' + #field.id)}}" fixed
-                                       obj key="id" text="name{{if (_page.entities[#field.entity]).attributes.name.i18n}}.{{l($locale)}}{{/if}}"
-                                       items="{{#root[#field.entity]}}" value="{{item[#field.id]}}" />
-                        {{else if #field.i18n}}
-                            {{each $locale.supported as #loc}}
-                                <div class="form-group">
-                                    <label for="{{#field.id}}.{{#loc}}" class="control-label">
-                                        {{t($locale, entity.id + "." + #field.id)}} ({{#loc}})
-                                    </label>
-                                    <input id="{{#field.id}}.{{#loc}}" class="form-control" type="{{#field.type}}" value="{{item[#field.id][#loc]}}" />
-                                </div>
-                            {{/}}
-                        {{else}}
-                            <div class="form-group">
-                                <label for="{{#field.id}}" class="control-label">
-                                    {{t($locale, entity.id + "." + #field.id)}}
-                                </label>
-                                <input id="{{#field.id}}" class="form-control" type="{{#field.type}}" value="{{item[#field.id]}}" />
-                            </div>
-                        {{/}}
-                    {{/each}}
-
-                    <div class="row">
-                        <button type="submit" class="btn btn-primary col-md-offset-10">
-                            {{if item.id}}
-                                {{t($locale, 'actions.done')}}
+                                {{/}}
                             {{else}}
-                                {{t($locale, 'actions.add')}}
+                                {{if typeof #item[#col.id] === 'object'}}
+                                    {{#item[#col.id][l($locale)]}}
+                                {{else}}
+                                    {{#item[#col.id]}}
+                                {{/}}
                             {{/}}
-                        </button>
-                        {{unless _page.item.id}}
-                            <button type="button" class="btn btn-link" on-click="cancel()">
-                                {{t($locale, 'actions.cancel')}}
-                            </button>
-                        {{/}}
-                    </div>
-                </form>
-            {{else}}
-                <a class="btn btn-primary col-md-offset-10" href="{{pathFor(entity.id, 'new')}}" role="button">
-                    {{ t($locale, 'actions.new', { 'ITEM': t($locale, entity.id + '.one') }) }}
-                </a>
-            {{/}}
-        </div>
-    </div>
+                        </td>
+                    {{/each}}
+                    <td>
+                        <span class="glyphicon glyphicon-remove" on-click="remove(#item.id)"></span>
+                    </td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
 
+
+    {{if item}}
+        <legend>
+            {{if item.id}}
+                {{t($locale, 'actions.edit')}} {{t($locale, entity.id + '.one')}}
+            {{else}}
+                {{t($locale, 'actions.add')}} {{t($locale, entity.id + '.one')}}
+            {{/}}
+        </legend>
+
+        <form role="form" class="well form-inline" on-submit="add(this)">
+            {{each entity.attributes as #field}}
+                {{if #field.type == "entity"}}
+                    <!-- this item could be a new item, so we cannot check for name being an object -->
+                    <d-select2 label="{{t($locale, entity.id + '.' + #field.id)}}" fixed
+                               obj key="id" text="name{{if (_page.entities[#field.entity]).attributes.name.i18n}}.{{l($locale)}}{{/if}}"
+                               items="{{#root[#field.entity]}}" value="{{item[#field.id]}}" />
+                {{else if #field.i18n}}
+                    {{each $locale.supported as #loc}}
+                        <div class="form-group">
+                            <label for="{{#field.id}}.{{#loc}}" class="control-label">
+                                {{t($locale, entity.id + "." + #field.id)}} ({{#loc}})
+                            </label>
+                            <input id="{{#field.id}}.{{#loc}}" class="form-control" type="{{#field.type}}" value="{{item[#field.id][#loc]}}" />
+                        </div>
+                    {{/}}
+                {{else}}
+                    <div class="form-group">
+                        <label for="{{#field.id}}" class="control-label">
+                            {{t($locale, entity.id + "." + #field.id)}}
+                        </label>
+                        <input id="{{#field.id}}" class="form-control" type="{{#field.type}}" value="{{item[#field.id]}}" />
+                    </div>
+                {{/}}
+            {{/each}}
+
+            <div class="row">
+                {{unless _page.item.id}}
+                    <button type="button" class="btn btn-default pull-right" on-click="cancel()">
+                        {{t($locale, 'actions.cancel')}}
+                    </button>
+                {{/}}
+                <button type="submit" class="btn btn-primary pull-right">
+                    {{if item.id}}
+                        {{t($locale, 'actions.done')}}
+                    {{else}}
+                        {{t($locale, 'actions.add')}}
+                    {{/}}
+                </button>
+            </div>
+        </form>
+    {{else}}
+        <a class="btn btn-primary pull-right" href="{{pathFor(entity.id, 'new')}}" role="button">
+            {{ t($locale, 'actions.new', { 'ITEM': t($locale, entity.id + '.one') }) }}
+        </a>
+    {{/}}
 
 
 
