@@ -18,15 +18,6 @@ export class Entity
     view: __dirname
     style: __dirname
 
-    # TODO: still needed with datatables?
-    function nameAscending(a, b)
-        aName = (a && a.name || '').toLowerCase()
-        bName = (b && b.name || '').toLowerCase()
-        if (aName < bName)
-            return -1
-        if (aName > bName)
-            return 1
-        return 0
 
     # called on the server and the client before rendering
     init: (model) !->
@@ -36,9 +27,10 @@ export class Entity
 
         # the list of entity instances to be displayed
         @list = model.root.at(@getAttribute("entity").id)
+        
+        # make items available in the local model as a list with filter
+        model.ref('_page.items', @list.filter(null))
 
-        ## make the items available sorted in the local model
-        model.ref('_page.items', @list.sort(nameAscending))
 
         ## change the entities array, as well as the attributes arrays of each entity to a map
         # important to deep-copy it!
@@ -121,7 +113,7 @@ export class Entity
                   targets:   0
                 ...
 
-            order: []
+            order: [[ 1, "asc" ]]
         )
 
         # prefill the fields
