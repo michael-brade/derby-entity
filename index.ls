@@ -23,14 +23,17 @@ export class Entity
     init: (model) !->
         model.ref('$locale', model.root.at('$locale'))
 
-        @item = model.at('item')
+        @item = model.at('item')                            # the item being added or edited
+        @items = model.root.at(@getAttribute("entity").id)  # the list of entity instances to be displayed
 
-        # the list of entity instances to be displayed
-        @list = model.root.at(@getAttribute("entity").id)
-        
-        # make items available in the local model as a list with filter
-        model.ref('_page.items', @list.filter(null))
+        # make items available in the local model as a list with a null-filter
+        model.ref '_page.items', @items.filter(null)
 
+        # make all dependent entity items available as lists under "_page.<entity id>"
+        @getAttribute("entity").attributes.forEach( (attr) ->
+            if (attr.type == 'entity')
+                model.ref '_page.' + attr.entity, model.root.filter(attr.entity, null)
+        )
 
         ## change the entities array, as well as the attributes arrays of each entity to a map
         # important to deep-copy it!
@@ -152,7 +155,7 @@ export class Entity
 
         @item.del! # TODO: is this needed??
 
-        @list.add(newItem)
+        @items.add(newItem)
         console.log("add: ", newItem.id)
 
         @emit("addedEntity", newItem)
@@ -170,7 +173,7 @@ export class Entity
         if @item.get("id") == id    # if id is already selected, deselect
             @deselect!
         else
-            @item.ref(@list.at(id)) # otherwise @item points to the selected item
+            @item.ref(@items.at(id)) # otherwise @item points to the selected item
             @app.history.push(@app.pathFor(@getAttribute("entity").id, id), false)
 
     deselect: ->
@@ -179,7 +182,7 @@ export class Entity
 
     remove: (id) ->
         console.log("remove: ", id)
-        @list.del(id)
+        @items.del(id)
 
     cancel: ->
         @deselect!
