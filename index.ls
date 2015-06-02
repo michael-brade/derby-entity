@@ -23,7 +23,7 @@ export class Entity
     init: (model) !->
         model.ref('$locale', model.root.at('$locale'))
 
-        @item = model.at('item')                            # the item being added or edited
+        @item = model.at('item')    # the item being added or edited - parameter, thus not _page!
         @items = model.root.at(@getAttribute("entity").id)  # the list of entity instances to be displayed
 
         # make items available in the local model as a list with a null-filter
@@ -61,6 +61,10 @@ export class Entity
      */
     create: (model, dom) ->
         console.log("Entity.create: ", @getAttribute("entity").id)
+
+        #dom.on 'keydown', (e) ~>   # this registers several dom listeners
+
+        $(document).keydown (e) ~> @keyActions.call(@, e)
 
         # init the table
         require('datatables')
@@ -121,7 +125,7 @@ export class Entity
 
         # prefill the fields
 
-        # if app.history.push() is called with rerender, destroy() and create() are called, but the old listener is never removed!
+        # if app.history.push() is called with render, destroy() and create() are called, but the old listener is never removed!
 
         # dom.on 'click', (e) ~>
         #     @deselect! unless @table.contains(e.target)
@@ -135,6 +139,22 @@ export class Entity
      */
     destroy: (model, dom) ->
         console.log("Entity.destroy: ", @getAttribute("entity").id, dom)
+
+        $(document).off 'keydown'
+
+
+    keyActions: (e) ->
+        return if not e
+
+        switch e.keyCode
+        | 13 =>
+            # if an item is edited or new -> done, else create a new one
+            if @item.get!
+                @done!
+            else
+                @app.history.push(@app.pathFor(@getAttribute("entity").id, 'new'))
+
+        | 27 => @cancel!
 
 
     # The following functions can be called from the view
