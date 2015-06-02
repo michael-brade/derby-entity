@@ -14,7 +14,7 @@
 
         <tbody>
             {{each _page.items as #item, #index}}
-                <tr class="{{if #item === _page.item}}active selected{{/}}" on-click="select(#item.id)">
+                <tr class="{{if #item === item}}active selected{{/}}" on-click="select(#item.id)">
                     <td></td> <!-- for the child row expansion -->
                     {{each entity.attributes as #col}}
                         <td>
@@ -85,18 +85,20 @@
             {{/each}}
 
             <div class="row">
-                {{unless _page.item.id}}
-                    <button type="button" class="btn btn-default pull-right" on-click="cancel()">
-                        {{t($locale, 'actions.cancel')}}
-                    </button>
-                {{/}}
-                <button type="submit" class="btn btn-primary pull-right">
-                    {{if item.id}}
-                        {{t($locale, 'actions.done')}}
-                    {{else}}
-                        {{t($locale, 'actions.add')}}
+                <div class="col-xs-12">
+                    {{unless item.id}}
+                        <button type="button" class="btn btn-default pull-right" on-click="cancel()">
+                            {{t($locale, 'actions.cancel')}}
+                        </button>
                     {{/}}
-                </button>
+                    <button type="submit" class="btn btn-primary pull-right">
+                        {{if item.id}}
+                            {{t($locale, 'actions.done')}}
+                        {{else}}
+                            {{t($locale, 'actions.add')}}
+                        {{/}}
+                    </button>
+                </div>
             </div>
         </form>
     {{else}}
