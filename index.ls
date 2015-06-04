@@ -72,12 +72,11 @@ export class Entity
         require('datatables.responsive')
         require('datatables.bootstrap')
 
-        # TODO: integrate with model changes (add, del rows, change contents, then update sorting)
         $(@table).DataTable(
             autowidth: true    # takes cpu, see also column.width
             #lenghthChange: false
 
-            dom: "tT"
+            dom: "t"  # "tT"
             info: false
             paging: false
             searching: false
@@ -121,6 +120,14 @@ export class Entity
                 ...
 
             order: [[ 1, "asc" ]]
+        )
+
+
+        # this finds the correct row to invalidate after a change
+        @tableUpdater = model.on("change", "_page.items.*.**", (rowindex, tail, cur, old) ~>
+            $(@table).DataTable().row("#" + @model.get("_page.items." + rowindex).id)
+                .invalidate()
+                .draw()
         )
 
         # prefill the fields

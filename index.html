@@ -14,7 +14,7 @@
 
         <tbody>
             {{each _page.items as #item, #index}}
-                <tr class="{{if #item === item}}active selected{{/}}" on-click="select(#item.id)">
+                <tr id="{{#item.id}}" class="{{if #item === item}}active selected{{/}}" on-click="select(#item.id)">
                     <td></td> <!-- for the child row expansion -->
                     {{each entity.attributes as #col}}
                         <td>
