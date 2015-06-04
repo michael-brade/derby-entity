@@ -162,10 +162,10 @@ export class Entity
 
     /* Add a new entity.
      *
-     * When called as "add(this)" from the view, "entity" will be the object with the current model data,
+     * When called as "add(this)" from the view, "this", the argument, will be the object with the current model data,
      * which is the same as this.model.data
      */
-    add: (entity) !->
+    done: (entity) !->
         # entity == this.model.data
         #console.log("userid " + @model.root.get('_session.userId'))
 

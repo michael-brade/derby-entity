@@ -53,7 +53,7 @@
             {{/}}
         </legend>
 
-        <form role="form" class="well form-inline" on-submit="add(this)">
+        <form role="form" class="well form-inline" on-submit="done(this)">
             {{each entity.attributes as #field}}
                 {{if #field.type == "entity"}}
                     <div class="form-group">
