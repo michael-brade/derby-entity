@@ -62,6 +62,8 @@ export class Entity
     create: (model, dom) ->
         console.log("Entity.create: ", @getAttribute("entity").id)
 
+        model.set '_page.refreshTable', 0
+
         #dom.on 'keydown', (e) ~>   # this registers several dom listeners
 
         $(document).keydown (e) ~> @keyActions.call(@, e)
@@ -72,7 +74,8 @@ export class Entity
         require('datatables.responsive')
         require('datatables.bootstrap')
 
-        $(@table).DataTable(
+        #$(@table).DataTable(
+        settings =
             autowidth: true    # takes cpu, see also column.width
             #lenghthChange: false
 
@@ -92,6 +95,12 @@ export class Entity
 
             stateSave: true
             stateDuration: 0
+            fnStateSaveCallback: (settings, data) !->
+                try localStorage.setItem 'EditorTables_' + settings.sInstance, JSON.stringify(data)
+
+            fnStateLoadCallback: (settings) ->
+                try JSON.parse(localStorage.getItem	'EditorTables_' + settings.sInstance)
+
 
             renderer: "bootstrap"
             responsive:
@@ -120,15 +129,52 @@ export class Entity
                 ...
 
             order: [[ 1, "asc" ]]
+
+        $(@table).DataTable(settings)
+
+
+        # EVENT REGISTRATION
+
+        @tableUpdater = model.on("all", "_page.items.*.**", (rowindex, pathsegment, event) ~>
+            console.log("ALL: ", arguments)
+
+            if event == 'change' && !pathsegment && rowindex != undefined # added/deleted a row
+                console.log("ALL: redo table ", arguments)
+                $(@table).DataTable().state.save()
+                $(@table).DataTable().destroy(false)
+                model.increment '_page.refreshTable'
+                requestAnimationFrame !~> $(@table).DataTable(settings)
+            else
+                $(@table).DataTable().row("#" + @model.get("_page.items." + rowindex).id)
+                    .invalidate()
+                    .draw()
         )
 
+        # locale changes
+        @tableUpdater = model.on("all", "$locale.**", (index, removed) ~>
+            model.increment '_page.refreshTable'
+            requestAnimationFrame !~> $(@table).DataTable(settings)
+        )
+
+        # insert and remove
+        /*
+        @tableUpdater = model.on("remove", "_page.items", (index, removed) ~>
+            console.log("REMOVE: ", index, removed)
+        )
+
+        @tableUpdater = model.on("insert", "_page.items", (index, values) ~>
+            console.log("INSERT: ", index, values)
+        )
+
+        @tableUpdater = model.on("change", "_page.items", (index, values) ~>
+            console.log("change: ", index, values)
+        )
 
         # this finds the correct row to invalidate after a change
         @tableUpdater = model.on("change", "_page.items.*.**", (rowindex, tail, cur, old) ~>
-            $(@table).DataTable().row("#" + @model.get("_page.items." + rowindex).id)
-                .invalidate()
-                .draw()
+            console.log("CHANGE: ", arguments)
         )
+        */
 
         # prefill the fields
 
@@ -188,7 +234,7 @@ export class Entity
         @emit("addedEntity", newItem)
         @emit("added" + @getAttribute("entity").id, newItem)
 
-        # TODO: use t() with parameters for this string!
+        # TODO: use t() with parameters for this string! check if newItem is an object and/or .name is i18n
         @model.toast('success', 'New <Entity> ' + newItem.name + ' added.')
 
         # Wait for all model changes to go through before going to the next page, mainly because

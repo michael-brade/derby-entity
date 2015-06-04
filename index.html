@@ -1,48 +1,53 @@
 <index:>
-    <table as="table" id="{{entity.id}}" class="table table-condensed table-hover compact" width="100%">
-        <thead>
-            <tr>
-                <th data-orderable="false"></th> <!-- for the child row expansion -->
-                {{each entity.attributes as #col}}
-                    <th>{{t($locale, entity.id + '.' + #col.id)}}</th>
-                {{/each}}
+    {{on _page.refreshTable}}
+        {{unbound}}
+            <table as="table" id="{{entity.id}}" class="table table-condensed table-hover compact" width="100%">
+                <thead>
+                    <tr>
+                        <th data-orderable="false"></th> <!-- for the child row expansion -->
+                        {{each entity.attributes as #col}}
+                            <th>{{t($locale, entity.id + '.' + #col.id)}}</th>
+                        {{/each}}
 
-                <!-- the Action column is "all"-ways visible -->
-                <th class="all" data-orderable="false" data-width="30">{{t($locale, 'actions.title')}}</th>
-            </tr>
-        </thead>
+                        <!-- the Action column is "all"-ways visible -->
+                        <th class="all" data-orderable="false" data-width="30">{{t($locale, 'actions.title')}}</th>
+                    </tr>
+                </thead>
 
-        <tbody>
-            {{each _page.items as #item, #index}}
-                <tr id="{{#item.id}}" class="{{if #item === item}}active selected{{/}}" on-click="select(#item.id)">
-                    <td></td> <!-- for the child row expansion -->
-                    {{each entity.attributes as #col}}
-                        <td>
-                            {{if #col.type == "entity"}}
-                                {{each #item[#col.id] as #subitem}}  <!-- each of the entity items -->
-                                    {{if typeof #subitem.name === 'object'}}
-                                        {{#subitem.name[$locale]}} &sp;
-                                    {{else}}
-                                        {{#subitem.name}} &sp;
-                                    {{/}}
-                                {{/}}
-                            {{else}}
-                                {{if typeof #item[#col.id] === 'object'}}
-                                    {{#item[#col.id][l($locale)]}}
-                                {{else}}
-                                    {{#item[#col.id]}}
-                                {{/}}
-                            {{/}}
-                        </td>
+                <tbody>
+                    {{each _page.items as #item, #index}}
+                        {{bound}}
+                            <tr id="{{#item.id}}" class="{{if #item === item}}active selected{{/}}" on-click="select(#item.id)">
+                                <td></td> <!-- for the child row expansion -->
+                                {{each entity.attributes as #col}}
+                                    <td>
+                                        {{if #col.type == "entity"}}
+                                            {{each #item[#col.id] as #subitem}}  <!-- each of the entity items -->
+                                                {{if typeof #subitem.name === 'object'}}
+                                                    {{#subitem.name[$locale]}} &sp;
+                                                {{else}}
+                                                    {{#subitem.name}} &sp;
+                                                {{/}}
+                                            {{/}}
+                                        {{else}}
+                                            {{if typeof #item[#col.id] === 'object'}}
+                                                {{#item[#col.id][l($locale)]}}
+                                            {{else}}
+                                                {{#item[#col.id]}}
+                                            {{/}}
+                                        {{/}}
+                                    </td>
+                                {{/each}}
+                                <td>
+                                    <span class="glyphicon glyphicon-remove" on-click="remove(#item.id)"></span>
+                                </td>
+                            </tr>
+                        {{/bound}}
                     {{/each}}
-                    <td>
-                        <span class="glyphicon glyphicon-remove" on-click="remove(#item.id)"></span>
-                    </td>
-                </tr>
-            {{/each}}
-        </tbody>
-    </table>
-
+                </tbody>
+            </table>
+        {{/unbound}}
+    {{/on}}
 
     {{if item}}
         <legend>
