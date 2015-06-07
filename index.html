@@ -24,9 +24,12 @@
                                         {{if #col.type == "entity"}}
                                             {{each #item[#col.id] as #subitem}}  <!-- each of the entity items -->
                                                 {{if typeof #subitem.name === 'object'}}
-                                                    {{#subitem.name[$locale]}} &sp;
+                                                    {{#subitem.name[l($locale)]}}
+                                                    {{each #subitem.name}}          <!-- works because each only iterates through arrays -->
+                                                        {{this.name}} &sp;
+                                                    {{/}} <br>
                                                 {{else}}
-                                                    {{#subitem.name}} &sp;
+                                                    {{#subitem.name}} <br>
                                                 {{/}}
                                             {{/}}
                                         {{else}}
@@ -66,8 +69,8 @@
                             {{t($locale, entity.id + '.' + #field.id)}}
                         </label>
                         <!-- this item could be a new item, so we cannot check for name being an object -->
-                        <d-select2 id="{{#field.id}}" fixed
-                                   obj key="id" text="name{{if (_page.entities[#field.entity]).attributes.name.i18n}}.{{l($locale)}}{{/if}}"
+                        <d-select2 id="{{#field.id}}" class="form-control" fixed
+                                   obj key="id" text="{{(_page.entities[#field.entity]).attributes.name.i18n ? 'name.' + l($locale) : 'name'}}"
                                    items="{{_page[#field.entity]}}" value="{{item[#field.id]}}" />
                     </div>
                 {{else if #field.i18n}}
