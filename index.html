@@ -17,7 +17,7 @@
                 <tbody>
                     {{each _page.items as #item, #index}}
                         {{bound}}
-                            <tr id="{{#item.id}}" class="{{if #item === item}}active selected{{/}}" on-click="select(#item.id)">
+                            <tr id="{{#item.id}}" class="{{if #item === _page.item}}active selected{{/}}" on-click="select(#item.id)">
                                 <td></td> <!-- for the child row expansion -->
                                 {{each entity.attributes as #col}}
                                     <td>
@@ -52,9 +52,9 @@
         {{/unbound}}
     {{/on}}
 
-    {{if item}}
+    {{if _page.item}}
         <legend>
-            {{if item.id}}
+            {{if _page.item.id}}
                 {{t($locale, 'actions.edit')}} {{t($locale, entity.id + '.one')}}
             {{else}}
                 {{t($locale, 'actions.add')}} {{t($locale, entity.id + '.one')}}
@@ -71,7 +71,7 @@
                         <!-- this item could be a new item, so we cannot check for name being an object -->
                         <d-select2 id="{{#field.id}}" class="form-control" fixed
                                    obj key="id" text="{{(_page.entities[#field.entity]).attributes.name.i18n ? 'name.' + l($locale) : 'name'}}"
-                                   items="{{_page[#field.entity]}}" value="{{item[#field.id]}}" />
+                                   items="{{_page[#field.entity]}}" value="{{_page.item[#field.id]}}" />
                     </div>
                 {{else if #field.i18n}}
                     {{each $locale.supported as #loc}}
@@ -79,7 +79,7 @@
                             <label for="{{#field.id}}.{{#loc}}" class="control-label">
                                 {{t($locale, entity.id + "." + #field.id)}} ({{#loc}})
                             </label>
-                            <input id="{{#field.id}}.{{#loc}}" class="form-control" type="{{#field.type}}" value="{{item[#field.id][#loc]}}" />
+                            <input id="{{#field.id}}.{{#loc}}" class="form-control" type="{{#field.type}}" value="{{_page.item[#field.id][#loc]}}" />
                         </div>
                     {{/}}
                 {{else}}
@@ -87,7 +87,7 @@
                         <label for="{{#field.id}}" class="control-label">
                             {{t($locale, entity.id + "." + #field.id)}}
                         </label>
-                        <input id="{{#field.id}}" class="form-control" type="{{#field.type}}" value="{{item[#field.id]}}" />
+                        <input id="{{#field.id}}" class="form-control" type="{{#field.type}}" value="{{_page.item[#field.id]}}" />
                     </div>
                 {{/}}
             {{/each}}
@@ -100,7 +100,7 @@
                         </button>
                     {{/}}
                     <button type="submit" class="btn btn-primary pull-right">
-                        {{if item.id}}
+                        {{if _page.item.id}}
                             {{t($locale, 'actions.done')}}
                         {{else}}
                             {{t($locale, 'actions.add')}}

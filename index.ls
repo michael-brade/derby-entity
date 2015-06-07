@@ -23,7 +23,7 @@ export class Entity
     init: (model) !->
         model.ref('$locale', model.root.at('$locale'))
 
-        @item = model.at('item')    # the item being added or edited - parameter, thus not _page!
+        @item = model.ref('_page.item', 'item')    # the item being added or edited - parameter, thus not _page!
         @items = model.root.at(@getAttribute("entity").id)  # the list of entity instances to be displayed
 
         # make items available in the local model as a list with a null-filter
@@ -227,7 +227,7 @@ export class Entity
 
         @item.removeRef!
 
-        if !(newItem = @item.get!) || newItem.id  # add only if exists and not in db yet
+        if not (newItem && !newItem.id)  # add only if exists and not in db yet
             @deselect!
             return
 
