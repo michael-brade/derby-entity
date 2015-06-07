@@ -42,7 +42,7 @@
                                     </td>
                                 {{/each}}
                                 <td>
-                                    <span class="glyphicon glyphicon-remove" on-click="remove(#item.id)"></span>
+                                    <span class="glyphicon glyphicon-remove" on-click="remove(#item.id, $event)"></span>
                                 </td>
                             </tr>
                         {{/bound}}

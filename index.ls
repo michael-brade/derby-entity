@@ -253,9 +253,10 @@ export class Entity
         @item.removeRef!
         @app.history.push(@app.pathFor(@getAttribute("entity").id), false)
 
-    remove: (id) ->
+    remove: (id, e) ->
         console.log("remove: ", id)
         @items.del(id)
+        e.stopPropagation! # don't select the row by bubbling up the event
 
     cancel: ->
         @deselect!
