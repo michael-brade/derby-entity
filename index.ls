@@ -183,6 +183,9 @@ export class Entity
         # dom.on 'click', (e) ~>
         #     @deselect! unless @table.contains(e.target)
 
+        if @item.get!
+            $(@form).find(':input[type!=hidden]').first().focus()
+
 
     /* Called when leaving the "page".
      *
@@ -201,10 +204,8 @@ export class Entity
 
         switch e.keyCode
         | 13 =>
-            # if an item is edited or new -> done, else create a new one
-            if @item.get!
-                @done!
-            else
+            # no form shown yet -> start new item
+            if !@item.get()
                 @app.history.push(@app.pathFor(@getAttribute("entity").id, 'new'))
 
         | 27 => @cancel!
@@ -222,13 +223,16 @@ export class Entity
         # entity == this.model.data
         #console.log("userid " + @model.root.get('_session.userId'))
 
+        newItem = @item.get!
+
+        @item.removeRef!
+
         if !(newItem = @item.get!) || newItem.id  # add only if exists and not in db yet
             @deselect!
             return
 
-        @item.del! # TODO: is this needed??
+        @items.add newItem
 
-        @items.add(newItem)
         console.log("add: ", newItem.id)
 
         @emit("addedEntity", newItem)
@@ -246,7 +250,9 @@ export class Entity
         if @item.get("id") == id    # if id is already selected, deselect
             @deselect!
         else
-            @item.ref(@items.at(id)) # otherwise @item points to the selected item
+            # otherwise @item points to the selected item and the first input is focused
+            @item.ref(@items.at(id))
+            $(@form).find(':input[type!=hidden]').first().focus()
             @app.history.push(@app.pathFor(@getAttribute("entity").id, id), false)
 
     deselect: ->
