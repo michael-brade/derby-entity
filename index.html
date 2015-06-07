@@ -94,18 +94,22 @@
 
             <div class="row">
                 <div class="col-xs-12">
-                    {{unless item.id}}
-                        <button type="button" class="btn btn-default pull-right" on-click="cancel()">
-                            {{t($locale, 'actions.cancel')}}
+                    <div class="pull-right">
+                        <button type="submit" class="btn btn-primary">
+                            {{if _page.item.id}}
+                                {{t($locale, 'actions.done')}}
+                            {{else}}
+                                {{t($locale, 'actions.add')}}
+                            {{/}}
                         </button>
-                    {{/}}
-                    <button type="submit" class="btn btn-primary pull-right">
-                        {{if _page.item.id}}
-                            {{t($locale, 'actions.done')}}
-                        {{else}}
-                            {{t($locale, 'actions.add')}}
+
+                        {{unless _page.item.id}}
+                            &sp;
+                            <button type="button" class="btn btn-default" on-click="cancel()">
+                                {{t($locale, 'actions.cancel')}}
+                            </button>
                         {{/}}
-                    </button>
+                    </div>
                 </div>
             </div>
         </form>
