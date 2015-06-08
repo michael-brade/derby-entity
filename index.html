@@ -27,10 +27,11 @@
                                                     {{#subitem.name[l($locale)]}}
                                                     {{each #subitem.name}}          <!-- works because each only iterates through arrays -->
                                                         {{this.name}} &sp;
-                                                    {{/}} <br>
+                                                    {{/}}
                                                 {{else}}
-                                                    {{#subitem.name}} <br>
+                                                    {{#subitem.name}}
                                                 {{/}}
+                                                <br>
                                             {{/}}
                                         {{else}}
                                             {{if typeof #item[#col.id] === 'object'}}
@@ -61,34 +62,28 @@
             {{/}}
         </legend>
 
-        <form as="form" role="form" class="well form-inline" on-submit="done(this)">
+        <form as="form" role="form" class="well form-horizontal" on-submit="done(this, $event)">
             {{each entity.attributes as #field}}
                 {{if #field.type == "entity"}}
-                    <div class="form-group">
-                        <label for="{{#field.id}}" class="control-label">
-                            {{t($locale, entity.id + '.' + #field.id)}}
-                        </label>
-                        <!-- this item could be a new item, so we cannot check for name being an object -->
+                    <fieldgroup id="{{#field.id}}" label="{{t($locale, entity.id + '.' + #field.id)}}">
+                        <!-- * this item could be a new item, so we cannot check for name being an object
+                             * each entity has to have a name attribute
+                             * if entity-of-text is given, text path is a path in that entity
+                        -->
                         <d-select2 id="{{#field.id}}" class="form-control" fixed
                                    obj key="id" text="{{(_page.entities[#field.entity]).attributes.name.i18n ? 'name.' + l($locale) : 'name'}}"
                                    items="{{_page[#field.entity]}}" value="{{_page.item[#field.id]}}" />
-                    </div>
+                   </fieldgroup>
                 {{else if #field.i18n}}
                     {{each $locale.supported as #loc}}
-                        <div class="form-group">
-                            <label for="{{#field.id}}.{{#loc}}" class="control-label">
-                                {{t($locale, entity.id + "." + #field.id)}} ({{#loc}})
-                            </label>
-                            <input id="{{#field.id}}.{{#loc}}" class="form-control" type="{{#field.type}}" value="{{_page.item[#field.id][#loc]}}" />
-                        </div>
+                        <fieldgroup id="{{#field.id}}.{{#loc}}" label="{{t($locale, entity.id + '.' + #field.id)}} ({{#loc}})"
+                               type="{{#field.type}}" value="{{_page.item[#field.id][#loc]}}">
+                        </fieldgroup>
                     {{/}}
                 {{else}}
-                    <div class="form-group">
-                        <label for="{{#field.id}}" class="control-label">
-                            {{t($locale, entity.id + "." + #field.id)}}
-                        </label>
-                        <input id="{{#field.id}}" class="form-control" type="{{#field.type}}" value="{{_page.item[#field.id]}}" />
-                    </div>
+                    <fieldgroup id="{{#field.id}}" label="{{t($locale, entity.id + '.' + #field.id)}}"
+                           type="{{#field.type}}" value="{{_page.item[#field.id]}}">
+                    </fieldgroup>
                 {{/}}
             {{/each}}
 
@@ -121,15 +116,18 @@
 
 
 
-
-<field: element="field">
-  <div class="form-group col-md-6">
-    <label for="{{@id}}" class="col-md-4 control-label">{{@label}}</label>
-    <div class="col-md-8">
-    {{if @content}}
-      {{@content}}
-    {{else}}
-      <input id="{{@id}}" class="form-control" type="{{@type}}" value="{{@value}}">
-    {{/if}}
+<!-- Arguments: id, label, type, value
+-->
+<field: element="fieldgroup">
+    <div class="form-group">
+        <label for="{{@id}}" class="col-sm-2 control-label">
+            {{@label}}
+        </label>
+        <div class="col-md-10">
+            {{if @content}}
+                {{@content}}
+            {{else}}
+                <input id="{{@id}}" class="form-control" type="{{@type}}" value="{{@value}}">
+            {{/if}}
+        </div>
     </div>
-  </div>
