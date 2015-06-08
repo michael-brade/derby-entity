@@ -60,7 +60,7 @@ export class Entity
      *  this.app.model is global model
      */
     create: (model, dom) ->
-        console.log("Entity.create: ", @getAttribute("entity").id)
+        #console.log("Entity.create: ", @getAttribute("entity").id)
 
         model.set '_page.refreshTable', 0
 
@@ -136,22 +136,14 @@ export class Entity
         # EVENT REGISTRATION
 
         @tableUpdater = model.on("all", "_page.items.*.**", (rowindex, pathsegment, event) ~>
-            console.log("ALL: ", arguments)
-
-            if event == 'change' && !pathsegment && rowindex != undefined # added/deleted a row
-                console.log("ALL: redo table ", arguments)
-                $(@table).DataTable().state.save()
-                $(@table).DataTable().destroy(false)
-                model.increment '_page.refreshTable'
-                requestAnimationFrame !~> $(@table).DataTable(settings)
-            else
-                $(@table).DataTable().row("#" + @model.get("_page.items." + rowindex).id)
-                    .invalidate()
-                    .draw()
+            $(@table).DataTable().state.save()
+            model.increment '_page.refreshTable'
+            requestAnimationFrame !~> $(@table).DataTable(settings)
         )
 
         # locale changes
         @tableUpdater = model.on("all", "$locale.**", (index, removed) ~>
+            $(@table).DataTable().state.save()
             model.increment '_page.refreshTable'
             requestAnimationFrame !~> $(@table).DataTable(settings)
         )
@@ -176,6 +168,8 @@ export class Entity
         )
         */
 
+        #model.on "all", "**", ~> console.log(arguments)
+
         # prefill the fields
 
         # if app.history.push() is called with render, destroy() and create() are called, but the old listener is never removed!
@@ -194,7 +188,8 @@ export class Entity
      *   - remove client libraries
      */
     destroy: (model, dom) ->
-        console.log("Entity.destroy: ", @getAttribute("entity").id, dom)
+        # TODO: Bug: dom is always null!
+        #console.log("Entity.destroy: ", @getAttribute("entity").id, dom)
 
         $(document).off 'keydown'
 
