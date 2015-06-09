@@ -17,8 +17,8 @@
                 <tbody>
                     {{each _page.items as #item, #index}}
                         {{bound}}
-                            <tr id="{{#item.id}}" class="{{if #item === _page.item}}active selected {{/}}no-text-selection" on-click="select(#item.id)">
-                                <td></td> <!-- for the child row expansion -->
+                            <tr id="{{#item.id}}" class="{{if #item === _page.item}}active selected {{/}}no-text-selection" on-click="select(#item.id, $event)">
+                                <td on-click="preventSelection($event)"></td> <!-- for the child row expansion -->
                                 {{each entity.attributes as #col}}
                                     <td>
                                         {{if #col.type == "entity"}}

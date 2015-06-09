@@ -241,7 +241,12 @@ export class Entity
         @model.whenNothingPending ~>
             @app.history.push(@app.pathFor(@getAttribute("entity").id), false)
 
-    select: (id) ->
+    preventSelection: (e) ->
+        e.preventSelection = true
+
+    select: (id, e) ->
+        return if e.preventSelection
+
         if @item.get("id") == id    # if id is already selected, deselect
             @deselect!
         else
