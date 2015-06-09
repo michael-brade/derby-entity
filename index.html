@@ -24,14 +24,17 @@
                                         {{if #col.type == "entity"}}
                                             {{each #item[#col.id] as #subitem}}  <!-- each of the entity items -->
                                                 {{if typeof #subitem.name === 'object'}}
-                                                    {{#subitem.name[l($locale)]}}
-                                                    {{each #subitem.name}}          <!-- works because each only iterates through arrays -->
-                                                        {{this.name}} &sp;
+                                                    {{if #subitem.name[l($locale)]}}
+                                                        {{#subitem.name[l($locale)]}} &sp;
+                                                    {{else}}
+                                                        {{each #subitem.name}}
+                                                            {{this.name}} &sp;
+                                                        {{/}}
+                                                        <br>
                                                     {{/}}
                                                 {{else}}
-                                                    {{#subitem.name}}
+                                                    {{#subitem.name}} &sp;
                                                 {{/}}
-                                                <br>
                                             {{/}}
                                         {{else}}
                                             {{if typeof #item[#col.id] === 'object'}}
@@ -62,7 +65,7 @@
             {{/}}
         </legend>
 
-        <form as="form" role="form" class="well form-horizontal" on-submit="done(this, $event)">
+        <form as="form" role="form" class="well form-horizontal" on-submit="done(this)">
             {{each entity.attributes as #field}}
                 {{if #field.type == "entity"}}
                     <fieldgroup id="{{#field.id}}" label="{{t($locale, entity.id + '.' + #field.id)}}">
