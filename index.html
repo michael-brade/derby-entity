@@ -62,8 +62,9 @@
                              * each entity has to have a name attribute
                              * if entity-of-text is given, text path is a path in that entity
                         -->
-                        <d-select2 id="{{#field.id}}" class="form-control" fixed
-                                   obj key="id" text="{{(_page.entities[#field.entity]).attributes.name.i18n ? 'name.' + l($locale) : 'name'}}"
+                        <d-select2 id="{{#field.id}}" class="form-control" fixed multi="{{#field.multi}}"
+                                   obj ref="{{#field.reference}}"
+                                   key="id" text="{{(_page.entities[#field.entity]).attributes.name.i18n ? 'name.' + l($locale) : 'name'}}"
                                    items="{{_page[#field.entity]}}" value="{{_page.item[#field.id]}}" />
                    </fieldgroup>
                 {{else if #field.i18n}}
