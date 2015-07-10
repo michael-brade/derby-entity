@@ -1,4 +1,7 @@
-_ = require 'lodash'  # use prelude.ls ?
+require! {
+    'lodash': _
+    '../../lib/entity/entity': { Entities }
+}
 
 # Display one entity with a table listing all instances on the left and
 # the attibutes of a selected entity on the right.
@@ -18,31 +21,32 @@ export class Entity
     view: __dirname
     style: __dirname
 
+    item: null
+    items: null
+    entities: null
 
     # called on the server and the client before rendering
     init: (model) !->
         model.ref('$locale', model.root.at('$locale'))
 
         @item = model.ref('_page.item', 'item')    # the item being added or edited - parameter, thus not _page!
-        @items = model.root.at(@getAttribute("entity").id)  # the list of entity instances to be displayed
 
-        # make items available in the local model as a list with a null-filter
-        model.ref '_page.items', @items.filter(null)
+        @items = model.root.at(@getAttribute("entity").id)  # the list of entity instances to be displayed
+        model.ref '_page.items', @items.filter(null)        # make items available in the local model as a list with a null-filter
+
+        @entities = new Entities(model, model.get('entities'))
 
         # make all dependent entity items available as lists under "_page.<entity id>"
-        @getAttribute("entity").attributes.forEach( (attr) ->
+        @getAttribute("entity").attributes.forEach (attr) ->
             if (attr.type == 'entity')
                 model.ref '_page.' + attr.entity, model.root.filter(attr.entity, null)
-        )
 
         ## change the entities array, as well as the attributes arrays of each entity to a map
-        # important to deep-copy it!
-        entities = _.indexBy(model.getDeepCopy('entities'), (entity) ->
-            entity.attributes = _.indexBy(entity.attributes, 'id')
-            return entity.id
-        )
+        model.set '_page.entities', @entities.getIdx!   # TODO: don't actually need this -> @entities.getIdx()
 
-        model.set('_page.entities', entities)
+
+    entities: ->
+        entities
 
 
     /* Only called on the client before rendering. It is possible to use jQuery in here.

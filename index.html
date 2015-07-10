@@ -22,19 +22,8 @@
                                 {{each entity.attributes as #col}}
                                     <td>
                                         {{if #col.type == "entity"}}
-                                            {{each #item[#col.id] as #subitem}}  <!-- each of the entity items -->
-                                                {{if typeof #subitem.name === 'object'}}
-                                                    {{if #subitem.name[l($locale)]}}
-                                                        {{#subitem.name[l($locale)]}} &sp;
-                                                    {{else}}
-                                                        {{each #subitem.name}}
-                                                            {{this.name}} &sp;
-                                                        {{/}}
-                                                        <br>
-                                                    {{/}}
-                                                {{else}}
-                                                    {{#subitem.name}} &sp;
-                                                {{/}}
+                                            {{each #item[#col.id] as #subitem}}  <!-- each of the entity items; TODO: what if this is only one element, not an array? -->
+                                                {{entities.getItemName(#subitem, _page.entities[#col.entity], l($locale))}}
                                             {{/}}
                                         {{else}}
                                             {{if typeof #item[#col.id] === 'object'}}
