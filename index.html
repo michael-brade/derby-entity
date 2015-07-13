@@ -21,17 +21,7 @@
                                 <td on-click="preventSelection($event)"></td> <!-- for the child row expansion -->
                                 {{each entity.attributes as #col}}
                                     <td>
-                                        {{if #col.type == "entity"}}
-                                            {{each #item[#col.id] as #subitem}}  <!-- each of the entity items; TODO: what if this is only one element, not an array? -->
-                                                {{entities.getItemName(#subitem, _page.entities[#col.entity], l($locale))}}
-                                            {{/}}
-                                        {{else}}
-                                            {{if typeof #item[#col.id] === 'object'}}
-                                                {{#item[#col.id][l($locale)]}}
-                                            {{else}}
-                                                {{#item[#col.id]}}
-                                            {{/}}
-                                        {{/}}
+                                        {{entities.getItemAttr(#item, #col.id, entity.id, l($locale))}}
                                     </td>
                                 {{/each}}
                                 <td>
