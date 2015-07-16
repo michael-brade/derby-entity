@@ -21,9 +21,8 @@ export class Entity
     view: __dirname
     style: __dirname
 
-    item: null
-    items: null
-    entities: null
+    # if declared here (part of the prototype), these are not private and visible in the view!
+    repository: null
 
     # called on the server and the client before rendering
     init: (model) !->
@@ -34,19 +33,13 @@ export class Entity
         @items = model.root.at(@getAttribute("entity").id)  # the list of entity instances to be displayed
         model.ref '_page.items', @items.filter(null)        # make items available in the local model as a list with a null-filter
 
-        @entities = new Entities(model, model.get('entities'))
+        @repository = new Entities(model, model.get('entities'))
 
         # make all dependent entity items available as lists under "_page.<entity id>"
         @getAttribute("entity").attributes.forEach (attr) ->
             if (attr.type == 'entity')
                 model.ref '_page.' + attr.entity, model.root.filter(attr.entity, null)
 
-        ## change the entities array, as well as the attributes arrays of each entity to a map
-        model.set '_page.entities', @entities.getIdx!   # TODO: don't actually need this -> @entities.getIdx()
-
-
-    entities: ->
-        entities
 
 
     /* Only called on the client before rendering. It is possible to use jQuery in here.

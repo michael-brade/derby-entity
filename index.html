@@ -21,7 +21,7 @@
                                 <td on-click="preventSelection($event)"></td> <!-- for the child row expansion -->
                                 {{each entity.attributes as #col}}
                                     <td>
-                                        {{entities.getItemAttr(#item, #col.id, entity.id, l($locale))}}
+                                        {{repository.getItemAttr(#item, #col.id, entity.id, l($locale))}}
                                     </td>
                                 {{/each}}
                                 <td>
@@ -50,12 +50,10 @@
                     <fieldgroup id="{{#field.id}}" label="{{t($locale, entity.id + '.' + #field.id)}}">
                         <!-- * this item could be a new item, so we cannot check for name being an object
                              * each entity has to have a name attribute
-                             * if entity-of-text is given, text path is a path in that entity
                         -->
-                        <d-select2 id="{{#field.id}}" class="form-control" fixed multi="{{#field.multi}}"
-                                   obj ref="{{#field.reference}}"
-                                   key="id" text="{{(_page.entities[#field.entity]).attributes.name.i18n ? 'name.' + l($locale) : 'name'}}"
-                                   items="{{_page[#field.entity]}}" value="{{_page.item[#field.id]}}" />
+                        <d-select2 id="select2-{{#field.id}}" class="form-control" fixed multi="{{#field.multi}}"
+                                   entities="{{repository.instance()}}" attribute="{{#field}}" locale="{{l($locale)}}"
+                                   value="{{_page.item[#field.id]}}" />
                    </fieldgroup>
                 {{else if #field.i18n}}
                     {{each $locale.supported as #loc}}
