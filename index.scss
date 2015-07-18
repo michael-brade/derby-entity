@@ -1,14 +1,8 @@
 $open-button-background: #337ab7 !default;
 
-@import "datatables/bootstrap.css";
-@import "datatables/responsive";
+@import 'datatables/bootstrap.css';
+@import 'datatables/responsive';
 
-.no-text-selection {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
 
 .entities {
 }
