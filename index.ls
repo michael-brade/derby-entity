@@ -49,10 +49,13 @@ export class Entity
      *   - model (ChildModel, aka ViewModel)
      *   - model.root (Model, parent/global model)
      *   - dom (Dom)
-              on/addListener/once(type, [target=document], listener, useCapture)
-              removeListener()
-     *   - app (App) [use for e.g. this.app.history.back()]
-     *   - page, parent (AppPage) [e.g. page.redirect('/home')]
+     *          on/addListener/once(type, [target=document], listener, useCapture)
+     *          removeListener()
+     *   - app (App)
+     *          use for e.g. this.app.history.back()
+     *   - page, parent (AppPage)
+     *          e.g. page.redirect('/home')
+     *          also has all view methods that were defined as <app>.proto.something
      *
      *  this.app.model is global model
      */
@@ -203,6 +206,7 @@ export class Entity
         | 27 => @cancel!
 
 
+
     # The following functions can be called from the view
 
 
@@ -230,8 +234,7 @@ export class Entity
         @emit("addedEntity", newItem)
         @emit("added" + @getAttribute("entity").id, newItem)
 
-        # TODO: use t() with parameters for this string! check if newItem is an object and/or .name is i18n
-        @model.toast('success', 'New <Entity> ' + newItem.name + ' added.')
+        @entityMessage newItem, 'messages.entityAdded'
 
         # Wait for all model changes to go through before going to the next page, mainly because
         # in non-single-page-app mode (basically IE < 10) we want changes to save to the server before leaving the page
@@ -258,8 +261,19 @@ export class Entity
 
     remove: (id, e) ->
         console.log("remove: ", id)
-        @items.del(id)
+        item = @items.del(id)
         e.stopPropagation! # don't select the row by bubbling up the event
+
+        @entityMessage item, 'messages.entityDeleted'
 
     cancel: ->
         @deselect!
+
+    entityMessage: (item, message) ->
+        loc = @model.get("$locale")
+        itemName = @repository.getItemAttr(item, 'name', @getAttribute("entity").id, @page.l(loc))
+
+        @model.toast('success', @page.t(loc, message, {
+            'ENTITY': @page.t(loc, @getAttribute("entity").id + '.one')
+            'ITEM': itemName
+        }))
