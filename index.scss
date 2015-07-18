@@ -5,4 +5,11 @@ $open-button-background: #337ab7 !default;
 
 
 .entities {
+    tr {
+        cursor: pointer;
+    }
+
+    .glyphicon-remove {
+        cursor: default;
+    }
 }
