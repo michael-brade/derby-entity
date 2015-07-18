@@ -221,25 +221,14 @@ export class Entity
 
         newItem = @item.get!
 
-        @item.removeRef!
+        if newItem && !newItem.id  # add only if exists and not in db yet
+            @items.add newItem
+            #@emit("added" + @getAttribute("entity").id, newItem)
 
-        if not (newItem && !newItem.id)  # add only if exists and not in db yet
-            @deselect!
-            return
+            @entityMessage newItem, 'messages.entityAdded'
 
-        @items.add newItem
+        @deselect!
 
-        console.log("add: ", newItem.id)
-
-        @emit("addedEntity", newItem)
-        @emit("added" + @getAttribute("entity").id, newItem)
-
-        @entityMessage newItem, 'messages.entityAdded'
-
-        # Wait for all model changes to go through before going to the next page, mainly because
-        # in non-single-page-app mode (basically IE < 10) we want changes to save to the server before leaving the page
-        @model.whenNothingPending ~>
-            @app.history.push(@app.pathFor(@getAttribute("entity").id), false)
 
     preventSelection: (e) ->
         e.preventSelection = true
@@ -255,12 +244,20 @@ export class Entity
             $(@form).find(':input[type!=hidden]').first().focus()
             @app.history.push(@app.pathFor(@getAttribute("entity").id, id), false)
 
-    deselect: ->
+    deselect: (push = true) ->
         @item.removeRef!
-        @app.history.push(@app.pathFor(@getAttribute("entity").id), false)
+        # in case of done(): Wait for all model changes to go through before going to the next page, mainly because
+        # in non-single-page-app mode (basically IE < 10) we want changes to save to the server before leaving the page
+        @model.whenNothingPending ~>
+            if push
+                @app.history.push(@app.pathFor(@getAttribute("entity").id), false)
+            else
+                @app.history.replace(@app.pathFor(@getAttribute("entity").id), false)
 
     remove: (id, e) ->
-        console.log("remove: ", id)
+        if @item.get("id") == id    # if id is already selected, deselect
+            @deselect false
+
         item = @items.del(id)
         e.stopPropagation! # don't select the row by bubbling up the event
 
