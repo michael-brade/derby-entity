@@ -20,7 +20,7 @@
                             <tr id="{{#item.id}}" class="{{if #item === _page.item}}active selected {{/}}no-text-selection" on-click="select(#item.id, $event)">
                                 <td on-click="preventSelection($event)"></td> <!-- for the child row expansion -->
                                 {{each entity.attributes as #col}}
-                                    <td>
+                                    <td style="{{if #col.type == 'color'}}background-color: {{#item[#col.id]}}{{/}}">
                                         {{repository.getItemAttr(#item, #col.id, entity.id, l($locale))}}
                                     </td>
                                 {{/each}}
