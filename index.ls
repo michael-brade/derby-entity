@@ -255,11 +255,21 @@ export class Entity
                 @app.history.replace(@app.pathFor(@getAttribute("entity").id), false)
 
     remove: (id, e) ->
+        e.stopPropagation! # don't select the row by bubbling up the event
+
+        if @repository.itemReferences id, @getAttribute("entity").id
+            usages = ""
+            loc = @model.get("$locale")
+            for usage in that
+                usages += "<br> * " + @page.t(loc, usage.entity + '.one') + " " + usage.item
+
+            @model.toast('error', @page.t(loc, 'messages.itemReferenced', { 'ENTITY': @page.t(loc, @getAttribute("entity").id + '.one') }) + usages)
+            return
+
         if @item.get("id") == id    # if id is already selected, deselect
             @deselect false
 
         item = @items.del(id)
-        e.stopPropagation! # don't select the row by bubbling up the event
 
         @entityMessage item, 'messages.entityDeleted'
 
