@@ -42,6 +42,7 @@ export class Entity
 
 
 
+
     /* Only called on the client before rendering. It is possible to use jQuery in here.
      *
      *  "this" (Entity) has:
@@ -179,6 +180,7 @@ export class Entity
 
         if @item.get!
             $(@form).find(':input[type!=hidden]').first().focus()
+            @startValidation!
 
 
     /* Called when leaving the "page".
@@ -243,8 +245,10 @@ export class Entity
             @item.ref(@items.at(id))
             $(@form).find(':input[type!=hidden]').first().focus()
             @app.history.push(@app.pathFor(@getAttribute("entity").id, id), false)
+            @startValidation!
 
     deselect: (push = true) ->
+        @stopValidation!
         @item.removeRef!
         # in case of done(): Wait for all model changes to go through before going to the next page, mainly because
         # in non-single-page-app mode (basically IE < 10) we want changes to save to the server before leaving the page
@@ -288,3 +292,30 @@ export class Entity
             'ENTITY': @page.t(loc, @getAttribute("entity").id + '.one')
             'ITEM': itemName
         }))
+
+    startValidation: ->
+        # there should be one output root path (containing an object with field IDs) and always a fn "validate()"
+        # input path is to the entity object (item? or item id?)
+
+        # @repository.forEachAttr @getAttribute("entity").attributes, (attrId) ~>
+        #     path = "$validation.form." + attrId
+        #     fn = @repository.getValidator attr, @getAttribute("entity").id, loc
+        #     @model.start(path, "_page.item." + attrId, fn)
+
+
+        @getAttribute("entity").attributes.forEach (attr) ~>
+            if attr.i18n
+                for loc in @model.get("$locale.supported")
+                    path = "$validation.form." + attr.id + "_" + loc
+                    if fn = @repository.getValidator attr, @getAttribute("entity").id, loc  # TODO: performance: don't call @getAttribute each iteration?!
+                        @model.start(path, "_page.item.id", "_page.item." + attr.id + "." + loc, fn)
+            else
+                path = "$validation.form." + attr.id
+                if fn = @repository.getValidator attr, @getAttribute("entity").id
+                    @model.start(path, "_page.item.id", "_page.item." + attr.id, fn)
+
+    stopValidation: ->
+        @model.stopAll("$validation.form")
+
+        # now clear the validation paths
+        @model.set("$validation.form", null)

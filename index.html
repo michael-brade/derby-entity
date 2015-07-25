@@ -57,7 +57,7 @@
                    </fieldgroup>
                 {{else if #field.i18n}}
                     {{each $locale.supported as #loc}}
-                        <fieldgroup id="{{#field.id}}.{{#loc}}" label="{{t($locale, entity.id + '.' + #field.id)}} ({{#loc}})"
+                        <fieldgroup id="{{#field.id}}_{{#loc}}" label="{{t($locale, entity.id + '.' + #field.id)}} ({{#loc}})"
                                type="{{#field.type}}" value="{{_page.item[#field.id][#loc]}}">
                         </fieldgroup>
                     {{/}}
@@ -100,15 +100,17 @@
 <!-- Arguments: id, label, type, value
 -->
 <field: element="fieldgroup">
-    <div class="form-group">
-        <label for="{{@id}}" class="col-sm-2 control-label">
-            {{@label}}
-        </label>
-        <div class="col-md-10">
-            {{if @content}}
-                {{@content}}
-            {{else}}
-                <input id="{{@id}}" class="form-control" type="{{@type}}" value="{{@value}}">
-            {{/if}}
+    {{with @id as #id}} <!-- BUG in Derby parsing: !$validation.form[@id] doesn't work! -->
+        <div class="form-group {{if $validation.form[#id] === false}}has-error{{/}}">
+            <label for="{{@id}}" class="col-sm-2 control-label">
+                {{@label}}
+            </label>
+            <div class="col-md-10">
+                {{if @content}}
+                    {{@content}}
+                {{else}}
+                    <input id="{{@id}}" class="form-control" type="{{@type}}" value="{{@value}}">
+                {{/if}}
+            </div>
         </div>
-    </div>
+    {{/}}
