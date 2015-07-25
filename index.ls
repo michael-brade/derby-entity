@@ -28,7 +28,7 @@ export class Entity
     init: (model) !->
         model.ref('$locale', model.root.at('$locale'))
 
-        @item = model.ref('_page.item', 'item')    # the item being added or edited - parameter, thus not _page!
+        @item = model.ref('_page.item', 'item')             # the item being added or edited - parameter, thus not _page!
 
         @items = model.root.at(@getAttribute("entity").id)  # the list of entity instances to be displayed
         model.ref '_page.items', @items.filter(null)        # make items available in the local model as a list with a null-filter
@@ -255,8 +255,10 @@ export class Entity
                 @app.history.replace(@app.pathFor(@getAttribute("entity").id), false)
 
     remove: (id, e) ->
-        e.stopPropagation! # don't select the row by bubbling up the event
+        # don't select the row by bubbling up the event
+        e.stopPropagation!
 
+        # check if the item to be deleted is still referenced
         if @repository.itemReferences id, @getAttribute("entity").id
             usages = ""
             loc = @model.get("$locale")
@@ -266,9 +268,11 @@ export class Entity
             @model.toast('error', @page.t(loc, 'messages.itemReferenced', { 'ENTITY': @page.t(loc, @getAttribute("entity").id + '.one') }) + usages)
             return
 
-        if @item.get("id") == id    # if id is already selected, deselect
+        # if id is already selected, deselect
+        if @item.get("id") == id
             @deselect false
 
+        # actually delete the item
         item = @items.del(id)
 
         @entityMessage item, 'messages.entityDeleted'
