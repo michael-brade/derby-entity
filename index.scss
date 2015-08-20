@@ -1,8 +1,25 @@
-$open-button-background: #337ab7 !default;
+$open-button-background: #337ab7;    // TODO: use global bootstrap variables
+$colreorder-insert-color: #337ab7;
+$table-selected: #08c;
 
-@import 'datatables/bootstrap.css';
-@import 'datatables/responsive';
+@import 'datatables/jquery.dataTables.css';
+@import 'datatables/dataTables.bootstrap.css';
 
+@import 'datatables/colReorder.dataTables';
+@import 'datatables/responsive.dataTables';
+@import 'datatables/select.dataTables';
+
+table.data-table tbody {
+    tr.selected,
+	th.selected,
+	td.selected {
+        color: white;
+
+        a {
+            color: #a2d4ed;
+		}
+	}
+}
 
 .entities {
     tr {

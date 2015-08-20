@@ -1,39 +1,31 @@
 <index:>
-    {{on _page.refreshTable}}
-        {{unbound}}
-            <table as="table" id="{{entity.id}}" class="table table-condensed table-hover compact" width="100%">
-                <thead>
-                    <tr>
-                        <th data-orderable="false"></th> <!-- for the child row expansion -->
-                        {{each entity.attributes as #col}}
-                            <th>{{t($locale, entity.id + '.' + #col.id)}}</th>
-                        {{/each}}
+    <table as="table" id="{{entity.id}}" class="table table-condensed table-hover compact no-text-selection" width="100%">
+        <thead>
+            <tr>
+                <th class="respond"></th> <!-- for the child row expansion -->
 
-                        <!-- the Action column is "all"-ways visible -->
-                        <th class="all" data-orderable="false" data-width="30">{{t($locale, 'actions.title')}}</th>
+                {{each entity.attributes as #col}}
+                    <th class="attr">{{t($locale, entity.id + '.' + #col.id)}}</th>
+                {{/each}}
+
+                <!-- the Action column is "all"-ways visible -->
+                <th class="all actions" data-width="30">{{t($locale, 'actions.title')}}</th>
+            </tr>
+        </thead>
+
+        <!--tbody>
+            {{each _page.items as #item, #index}}
+                    <tr id="{{#item.id}}" class="{{if #item === _page.item}}active selected {{/}}no-text-selection" on-click="select(#item.id, $event)">
+
+                        <td on-click="preventSelection($event)"></td> <!- for the child row expansion ->
+
+t                        <td>
+                            <span class="glyphicon glyphicon-remove" on-click="remove(#item.id, $event)"></span>
+                        </td>
                     </tr>
-                </thead>
-
-                <tbody>
-                    {{each _page.items as #item, #index}}
-                        {{bound}}
-                            <tr id="{{#item.id}}" class="{{if #item === _page.item}}active selected {{/}}no-text-selection" on-click="select(#item.id, $event)">
-                                <td on-click="preventSelection($event)"></td> <!-- for the child row expansion -->
-                                {{each entity.attributes as #col}}
-                                    <td style="{{if #col.type == 'color'}}background-color: {{#item[#col.id]}}{{/}}">
-                                        {{repository.getItemAttr(#item, #col.id, entity.id, l($locale))}}
-                                    </td>
-                                {{/each}}
-                                <td>
-                                    <span class="glyphicon glyphicon-remove" on-click="remove(#item.id, $event)"></span>
-                                </td>
-                            </tr>
-                        {{/bound}}
-                    {{/each}}
-                </tbody>
-            </table>
-        {{/unbound}}
-    {{/on}}
+            {{/each}}
+        </tbody-->
+    </table>
 
     {{if _page.item}}
         <legend>

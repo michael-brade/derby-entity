@@ -63,33 +63,40 @@ export class Entity
     create: (model, dom) ->
         #console.log("Entity.create: ", @getAttribute("entity").id)
 
-        model.set '_page.refreshTable', 0
-
         #dom.on 'keydown', (e) ~>   # this registers several dom listeners
 
         $(document).keydown (e) ~> @keyActions.call(@, e)
 
         # init the table
         require('datatables')
-        require('datatables.tableTools')
-        require('datatables.responsive')
         require('datatables.bootstrap')
+        require('datatables.responsive')
+        require('datatables.select')
+        require('datatables.colVis')
+        require('datatables.colReorder')
 
         #$(@table).DataTable(
         settings =
             autowidth: true    # takes cpu, see also column.width
             #lenghthChange: false
 
-            dom: "t"  # "tT"
+            dom: "t" # 'C<"clear">t' for ColVis
             info: false
             paging: false
             searching: false
 
-            tableTools:
-                aButtons: []        # only use selection features of TableTools
-                sRowSelect: "single"
-                sSelectedClass: "selected active"
-                #fnRowSelected: @select
+            colReorder:
+                fixedColumnsLeft: 1
+
+            colVis:
+                aiExclude: [ 0 ]
+
+            select:
+                style:    'single'
+                info:     false
+                selector: 'td:not(.control, .actions)'
+                items:    'row'
+                blurable: true
 
             #scrollY: 300
             #scrollCollapse: true
@@ -107,6 +114,7 @@ export class Entity
             responsive:
                 details:
                     type: "column"
+                    target: 0
                     renderer: (api, rowIdx) ->
                         # Select hidden columns for the given row
                         data = api.cells(rowIdx, ':hidden').eq(0).map( (cell) ->
@@ -124,12 +132,47 @@ export class Entity
 
                         return if data then $('<table/>').append(data) else false
 
-            columnDefs:
-                * className: 'control'
-                  targets:   0
-                ...
+            data: @repository.getItems @getAttribute("entity").id
 
             order: [[ 1, "asc" ]]
+
+            columnDefs: [
+                {
+                    targets: "respond"
+                    className: "control"
+                    orderable: false
+                    searchable: false
+                    data: null
+                    render: (data, type, full, meta) ->
+                        return ''
+                }
+                {
+                    targets: "attr"
+                    data: null
+                    render: (data, type, full, meta) ~>
+                        #console.log("render:", @, data, type, full, meta)
+                        #console.log "entity:", @getAttribute("entity")
+                        #console.log "attrib:", @getAttribute("entity").attributes[meta.col - 1]
+
+                        attr = @getAttribute("entity").attributes[meta.col - 1]
+                        return "err" if not attr
+
+                        if type == 'display' and attr.type == 'color'
+                            api = meta.settings.oInstance.api(true)
+                            jQuery(api.cell(meta.row, meta.col).node()).css("background-color", full[attr.id])
+
+                        return @repository.getItemAttr full, attr.id, @getAttribute("entity").id    # TODO: , locale!!!
+                }
+                {
+                    targets: "actions",
+                    orderable: false,
+                    searchable: false,
+                    data: "id",
+                    render: (data, type, full, meta) ->
+                        return '<span class="glyphicon glyphicon-remove" on-click="remove(' + data + ', $event)"></span>'
+                }
+            ]
+
 
         $(@table).DataTable(settings)
 
@@ -138,14 +181,12 @@ export class Entity
 
         @tableUpdater = model.on("all", "_page.items.*.**", (rowindex, pathsegment, event) ~>
             $(@table).DataTable().state.save()
-            model.increment '_page.refreshTable'
             requestAnimationFrame !~> $(@table).DataTable(settings)
         )
 
         # locale changes
         @tableUpdater = model.on("all", "$locale.**", (index, removed) ~>
             $(@table).DataTable().state.save()
-            model.increment '_page.refreshTable'
             requestAnimationFrame !~> $(@table).DataTable(settings)
         )
 
