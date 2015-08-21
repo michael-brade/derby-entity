@@ -71,7 +71,6 @@ export class Entity
         require('datatables')
         require('datatables.bootstrap')
         require('datatables.responsive')
-        require('datatables.select')
         require('datatables.colVis')
         require('datatables.colReorder')
 
@@ -91,13 +90,6 @@ export class Entity
             colVis:
                 aiExclude: [ 0 ]
 
-            select:
-                style:    'single'
-                info:     false
-                selector: 'td:not(.control, .actions)'
-                items:    'row'
-                blurable: true
-
             #scrollY: 300
             #scrollCollapse: true
 
@@ -107,7 +99,7 @@ export class Entity
                 try localStorage.setItem 'EditorTables_' + settings.sInstance, JSON.stringify(data)
 
             fnStateLoadCallback: (settings) ->
-                try JSON.parse(localStorage.getItem	'EditorTables_' + settings.sInstance)
+                try JSON.parse(localStorage.getItem 'EditorTables_' + settings.sInstance)
 
 
             renderer: "bootstrap"
@@ -133,6 +125,7 @@ export class Entity
                         return if data then $('<table/>').append(data) else false
 
             data: @repository.getItems @getAttribute("entity").id
+            rowId: 'id'
 
             order: [[ 1, "asc" ]]
 
@@ -159,7 +152,7 @@ export class Entity
 
                         if type == 'display' and attr.type == 'color'
                             api = meta.settings.oInstance.api(true)
-                            jQuery(api.cell(meta.row, meta.col).node()).css("background-color", full[attr.id])
+                            $(api.cell(meta.row, meta.col).node()).css("background-color", full[attr.id])
 
                         return @repository.getItemAttr full, attr.id, @getAttribute("entity").id    # TODO: , locale!!!
                 }
@@ -174,41 +167,43 @@ export class Entity
             ]
 
 
-        $(@table).DataTable(settings)
+        $.fn.dataTable.Api.register 'deselect()', ->
+            this.$('tr.selected').removeClass('selected')
+
+        $.fn.dataTable.Api.register 'select()', (itemId) ->
+            this.$('tr#' + itemId).addClass('selected')
+
+        @dtApi = $(@table).DataTable(settings)
+
+        @enableMouseSelection 'td:not(.control, .actions)'
 
 
         # EVENT REGISTRATION
 
         @tableUpdater = model.on("all", "_page.items.*.**", (rowindex, pathsegment, event) ~>
             $(@table).DataTable().state.save()
-            requestAnimationFrame !~> $(@table).DataTable(settings)
         )
+
+        # this finds the correct row to invalidate after a change
+        @tableUpdater = model.on "change", "_page.items.*.**", (rowindex, tail, cur, old) ~>
+            console.log("CHANGE: ", arguments)
+
+        @tableUpdater = model.on "change", "_page.items", (index, values) ~>
+            console.log("change items: ", index, values)
 
         # locale changes
         @tableUpdater = model.on("all", "$locale.**", (index, removed) ~>
             $(@table).DataTable().state.save()
-            requestAnimationFrame !~> $(@table).DataTable(settings)
         )
 
         # insert and remove
-        /*
-        @tableUpdater = model.on("remove", "_page.items", (index, removed) ~>
+        @tableUpdater = model.on "remove", "_page.items", (index, removed) ~>
             console.log("REMOVE: ", index, removed)
-        )
 
-        @tableUpdater = model.on("insert", "_page.items", (index, values) ~>
+        @tableUpdater = model.on "insert", "_page.items", (index, values) ~>
             console.log("INSERT: ", index, values)
-        )
 
-        @tableUpdater = model.on("change", "_page.items", (index, values) ~>
-            console.log("change: ", index, values)
-        )
 
-        # this finds the correct row to invalidate after a change
-        @tableUpdater = model.on("change", "_page.items.*.**", (rowindex, tail, cur, old) ~>
-            console.log("CHANGE: ", arguments)
-        )
-        */
 
         #model.on "all", "**", ~> console.log(arguments)
 
@@ -220,6 +215,7 @@ export class Entity
         #     @deselect! unless @table.contains(e.target)
 
         if @item.get!
+            @dtApi.select(@item.get().id)
             $(@form).find(':input[type!=hidden]').first().focus()
             @startValidation!
 
@@ -235,6 +231,51 @@ export class Entity
         #console.log("Entity.destroy: ", @getAttribute("entity").id, dom)
 
         $(document).off 'keydown'
+
+
+
+    enableMouseSelection: (selector) ->
+        body = $(@dtApi.table().body())
+        body.on 'click.dtSelect', selector, (e) ~>
+
+            # Ignore clicks inside a sub-table
+            if $(e.target).closest('tbody')[0] != body[0]
+                return
+
+            cell = @dtApi.cell(e.target)
+            # Check the cell actually belongs to the host DataTable (so child rows, etc, are ignored)
+            if not cell.any()
+                return
+
+            rowIdx = cell.index().row
+            $row = @dtApi.rows(rowIdx).nodes().to$()
+            itemId = @dtApi.row(rowIdx).data().id
+
+            if $row.hasClass('selected')
+                @dtApi.deselect!
+                @deselect!
+            else
+                @dtApi.deselect!
+                $row.addClass('selected')
+                @select itemId
+
+
+
+        # blurable: clicking outside of the table deselects
+        $('body').on 'click.dtSelect', (e) ~>
+            # if the click was inside the DataTables container, don't blur
+            if $(e.target).parents().filter( @dtApi.table().container() ).length
+                return
+
+            # don't blur in edit form
+            if e.target == @form or $(e.target).parents().filter(@form).length
+                return
+
+            # only blur if an element was selected
+            if @item.get!
+                @dtApi.deselect!
+                @deselect!
+
 
 
     keyActions: (e) ->
@@ -273,12 +314,7 @@ export class Entity
         @deselect!
 
 
-    preventSelection: (e) ->
-        e.preventSelection = true
-
-    select: (id, e) ->
-        return if e.preventSelection
-
+    select: (id) ->
         if @item.get("id") == id    # if id is already selected, deselect
             @deselect!
         else
@@ -299,10 +335,7 @@ export class Entity
             else
                 @app.history.replace(@app.pathFor(@getAttribute("entity").id), false)
 
-    remove: (id, e) ->
-        # don't select the row by bubbling up the event
-        e.stopPropagation!
-
+    remove: (id) ->
         # check if the item to be deleted is still referenced
         if @repository.itemReferences id, @getAttribute("entity").id
             usages = ""
@@ -323,6 +356,7 @@ export class Entity
         @entityMessage item, 'messages.entityDeleted'
 
     cancel: ->
+        @dtApi.deselect!
         @deselect!
 
     entityMessage: (item, message) ->
