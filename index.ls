@@ -185,8 +185,14 @@ export class Entity
         )
 
         # this finds the correct row to invalidate after a change
-        @tableUpdater = model.on "change", "_page.items.*.**", (rowindex, tail, cur, old) ~>
-            console.log("CHANGE: ", arguments)
+        @tableUpdater = model.on "change", "_page.items.*.**", (rowindex, path, cur, old) ~>
+            # id = model.get("_page.items." + rowindex).id
+            # row = @dtApi.row('#' + id)
+            row = @dtApi.row(rowindex)
+            item = row.data!
+            _.set(item, path, cur)
+            row.invalidate!
+            requestAnimationFrame !~> row.draw!   # requestAnimationFrame because draw is slow
 
         @tableUpdater = model.on "change", "_page.items", (index, values) ~>
             console.log("change items: ", index, values)
