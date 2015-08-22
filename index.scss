@@ -2,7 +2,6 @@ $open-button-background: #337ab7;    // TODO: use global bootstrap variables
 $colreorder-insert-color: #337ab7;
 $table-selected: #08c;
 
-@import 'datatables/jquery.dataTables.css';
 @import 'datatables/dataTables.bootstrap.css';
 
 @import 'datatables/colReorder.dataTables';
