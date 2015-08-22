@@ -130,17 +130,15 @@ export class Entity
             order: [[ 1, "asc" ]]
 
             columnDefs: [
-                {
-                    targets: "respond"
+                *   targets: "respond"
                     className: "control"
                     orderable: false
                     searchable: false
                     data: null
                     render: (data, type, full, meta) ->
                         return ''
-                }
-                {
-                    targets: "attr"
+
+                *   targets: "attr"
                     data: null
                     render: (data, type, full, meta) ~>
                         #console.log("render:", @, data, type, full, meta)
@@ -155,15 +153,14 @@ export class Entity
                             $(api.cell(meta.row, meta.col).node()).css("background-color", full[attr.id])
 
                         return @repository.getItemAttr full, attr.id, @getAttribute("entity").id    # TODO: , locale!!!
-                }
-                {
-                    targets: "actions",
-                    orderable: false,
-                    searchable: false,
-                    data: "id",
+
+                *   targets: "actions"
+                    className: "actions"
+                    orderable: false
+                    searchable: false
+                    data: "id"
                     render: (data, type, full, meta) ->
-                        return '<span class="glyphicon glyphicon-remove" on-click="remove(' + data + ', $event)"></span>'
-                }
+                        return '<span class="action-remove glyphicon glyphicon-remove"></span>'
             ]
 
 
@@ -176,49 +173,72 @@ export class Entity
         @dtApi = $(@table).DataTable(settings)
 
         @enableMouseSelection 'td:not(.control, .actions)'
-
+        @enableMouseDeletion!
 
         # EVENT REGISTRATION
 
-        @tableUpdater = model.on("all", "_page.items.*.**", (rowindex, pathsegment, event) ~>
+        #model.on "all", "**", -> console.log(arguments)
+
+        model.on "all", "_page.items.*.**", (rowindex, pathsegment, event) ~>
+            console.log("all", arguments)
             $(@table).DataTable().state.save()
-        )
+
+        # locale changes
+        model.on "all", "$locale.**", (index, removed) ~>
+            $(@table).DataTable().state.save()
+
 
         # this finds the correct row to invalidate after a change
-        @tableUpdater = model.on "change", "_page.items.*.**", (rowindex, path, cur, old) ~>
-            # id = model.get("_page.items." + rowindex).id
-            # row = @dtApi.row('#' + id)
+        # path is:
+        #   "" if a new item was added
+        #   undefined if an item was deleted
+        model.on "change", "_page.items.*.**", (rowindex, path, cur, old) ~>
+            return if not path
+            # id = model.get("_page.items." + rowindex).id(true)
+            # row = @dtApi.row(id)
             row = @dtApi.row(rowindex)
             item = row.data!
             _.set(item, path, cur)
             row.invalidate!
-            requestAnimationFrame !~> row.draw!   # requestAnimationFrame because draw is slow
+            requestAnimationFrame !-> row.draw!   # requestAnimationFrame because draw is slow
 
-        @tableUpdater = model.on "change", "_page.items", (index, values) ~>
-            console.log("change items: ", index, values)
+        # the following three are array events
+        model.on "move", "_page.items.*.**", (rowindex, path, iFrom, iTo, howMany) ~>
+            row = @dtApi.row(rowindex).invalidate!
+            # no need to move the element in the table data, for the array is a reference
+            requestAnimationFrame !-> row.draw!
 
-        # locale changes
-        @tableUpdater = model.on("all", "$locale.**", (index, removed) ~>
-            $(@table).DataTable().state.save()
-        )
+        model.on "insert", "_page.items.*.**", (rowindex, path, iPos) ~>
+            row = @dtApi.row(rowindex).invalidate!
+            requestAnimationFrame !-> row.draw!
 
-        # insert and remove
-        @tableUpdater = model.on "remove", "_page.items", (index, removed) ~>
-            console.log("REMOVE: ", index, removed)
+        model.on "remove", "_page.items.*.**", (rowindex, path, iPos) ~>
+            row = @dtApi.row(rowindex).invalidate!
+            requestAnimationFrame !-> row.draw!
 
-        @tableUpdater = model.on "insert", "_page.items", (index, values) ~>
-            console.log("INSERT: ", index, values)
+        # TODO: when is this called??
+        model.on "change", "_page.items", (index, values) ~>
+            console.log "change items: ", arguments
 
 
+        # insert and remove -- first the captures, then the rest
+        # items is an array
+        model.on "insert", "_page.items", (index, items) ~>
+            for item in items
+                row = @dtApi.row.add(item)
+                requestAnimationFrame !-> row.draw!
 
-        #model.on "all", "**", ~> console.log(arguments)
+            # $(rowNode)
+            #     .css( 'background-color', 'red' )
+            #     .animate { 'background-color': 'white' }
 
-        # prefill the fields
+        model.on "remove", "_page.items", (rowindex, removed) ~>
+            row = @dtApi.row(rowindex).remove!
+            requestAnimationFrame !-> row.draw!
+
+
 
         # if app.history.push() is called with render, destroy() and create() are called, but the old listener is never removed!
-
-        # dom.on 'click', (e) ~>
-        #     @deselect! unless @table.contains(e.target)
 
         if @item.get!
             @dtApi.select(@item.get().id)
@@ -245,13 +265,11 @@ export class Entity
         body.on 'click.dtSelect', selector, (e) ~>
 
             # Ignore clicks inside a sub-table
-            if $(e.target).closest('tbody')[0] != body[0]
-                return
+            return if $(e.target).closest('tbody')[0] != body[0]
 
-            cell = @dtApi.cell(e.target)
             # Check the cell actually belongs to the host DataTable (so child rows, etc, are ignored)
-            if not cell.any()
-                return
+            cell = @dtApi.cell(e.target)
+            return if not cell.any()
 
             rowIdx = cell.index().row
             $row = @dtApi.rows(rowIdx).nodes().to$()
@@ -267,21 +285,29 @@ export class Entity
 
 
 
-        # blurable: clicking outside of the table deselects
+        # blur: clicking outside of the table deselects
         $('body').on 'click.dtSelect', (e) ~>
+            #console.log e, $(e.target).parents()
+
             # if the click was inside the DataTables container, don't blur
-            if $(e.target).parents().filter( @dtApi.table().container() ).length
-                return
+            return if $(e.target).parents().filter( @dtApi.table().container() ).length
 
             # don't blur in edit form
-            if e.target == @form or $(e.target).parents().filter(@form).length
-                return
+            return if e.target == @form
+                or $(e.target).parents().filter(@form).length
+                or $(e.target).parents('.select2-container').length             # select2-container is in body
+                or $(e.target).hasClass('select2-selection__choice__remove')    # TODO: why isn't .filter(@form) enough?
 
             # only blur if an element was selected
             if @item.get!
                 @dtApi.deselect!
                 @deselect!
 
+
+    enableMouseDeletion: ->
+        $tbody = $(@dtApi.table().body())
+        $tbody.on 'click', 'tr > td.actions .action-remove', (e) ~>
+            @remove @dtApi.row( $(e.target).parents('tr') ).id!
 
 
     keyActions: (e) ->
@@ -354,6 +380,7 @@ export class Entity
 
         # if id is already selected, deselect
         if @item.get("id") == id
+            @dtApi.deselect!
             @deselect false
 
         # actually delete the item

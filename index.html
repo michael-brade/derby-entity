@@ -12,19 +12,6 @@
                 <th class="all actions" data-width="30">{{t($locale, 'actions.title')}}</th>
             </tr>
         </thead>
-
-        <!--tbody>
-            {{each _page.items as #item, #index}}
-                    <tr id="{{#item.id}}" class="{{if #item === _page.item}}active selected {{/}}no-text-selection" on-click="select(#item.id, $event)">
-
-                        <td on-click="preventSelection($event)"></td> <!- for the child row expansion ->
-
-t                        <td>
-                            <span class="glyphicon glyphicon-remove" on-click="remove(#item.id, $event)"></span>
-                        </td>
-                    </tr>
-            {{/each}}
-        </tbody-->
     </table>
 
     {{if _page.item}}
