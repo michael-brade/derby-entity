@@ -303,7 +303,6 @@ export class Entity
 
             # only blur if an element was selected
             if @item.get!
-                @dtApi.deselect!
                 @deselect!
 
 
@@ -360,6 +359,7 @@ export class Entity
             @startValidation!
 
     deselect: (push = true) ->
+        @dtApi.deselect!
         @stopValidation!
         @item.removeRef!
         # in case of done(): Wait for all model changes to go through before going to the next page, mainly because
@@ -383,7 +383,6 @@ export class Entity
 
         # if id is already selected, deselect
         if @item.get("id") == id
-            @dtApi.deselect!
             @deselect false
 
         # actually delete the item
@@ -392,7 +391,6 @@ export class Entity
         @entityMessage item, 'messages.entityDeleted'
 
     cancel: ->
-        @dtApi.deselect!
         @deselect!
 
     entityMessage: (item, message) ->
