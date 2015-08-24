@@ -139,20 +139,23 @@ export class Entity
                         return ''
 
                 *   targets: "attr"
-                    data: null
-                    render: (data, type, full, meta) ~>
+                    data:  (data, type, value, meta) ~>
                         #console.log("render:", @, data, type, full, meta)
                         #console.log "entity:", @getAttribute("entity")
                         #console.log "attrib:", @getAttribute("entity").attributes[meta.col - 1]
+
+                        if type == 'set'
+                            console.warn "setting values not supported!"
+                            return
 
                         attr = @getAttribute("entity").attributes[meta.col - 1]
                         return "err" if not attr
 
                         if type == 'display' and attr.type == 'color'
                             api = meta.settings.oInstance.api(true)
-                            $(api.cell(meta.row, meta.col).node()).css("background-color", full[attr.id])
+                            $(api.cell(meta.row, meta.col).node()).css("background-color", data[attr.id])
 
-                        return @repository.getItemAttr full, attr.id, @getAttribute("entity").id    # TODO: , locale!!!
+                        return @repository.getItemAttr data, attr.id, @getAttribute("entity").id    # TODO: , locale!!!
 
                 *   targets: "actions"
                     className: "actions"
