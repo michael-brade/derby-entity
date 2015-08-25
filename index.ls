@@ -289,21 +289,21 @@ export class Entity
 
 
         # blur: clicking outside of the table deselects
-        $('body').on 'click.dtSelect', (e) ~>
-            #console.log e, $(e.target).parents()
-
-            # if the click was inside the DataTables container, don't blur
-            return if $(e.target).parents().filter( @dtApi.table().container() ).length
-
-            # don't blur in edit form
-            return if e.target == @form
-                or $(e.target).parents().filter(@form).length
-                or $(e.target).parents('.select2-container').length             # select2-container is in body
-                or $(e.target).hasClass('select2-selection__choice__remove')    # TODO: why isn't .filter(@form) enough?
-
-            # only blur if an element was selected
-            if @item.get!
-                @deselect!
+        # $('body').on 'click.dtSelect', (e) ~>
+        #     #console.log e, $(e.target).parents()
+        #
+        #     # if the click was inside the DataTables container, don't blur
+        #     return if $(e.target).parents().filter( @dtApi.table().container() ).length
+        #
+        #     # don't blur in edit form
+        #     return if e.target == @form
+        #         or $(e.target).parents().filter(@form).length
+        #         or $(e.target).parents('.select2-container').length             # select2-container is in body
+        #         or $(e.target).hasClass('select2-selection__choice__remove')    # TODO: why isn't .filter(@form) enough?
+        #
+        #     # only blur if an element was selected
+        #     if @item.get!
+        #         @deselect!
 
 
     enableMouseDeletion: ->
