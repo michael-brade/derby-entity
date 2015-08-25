@@ -1,28 +1,83 @@
-$open-button-background: #337ab7;    // TODO: use global bootstrap variables
-$colreorder-insert-color: #337ab7;
-$table-selected: #08c;
+// Import custom Bootstrap variables
+@import 'bootstrap-variables';
+
+// Then import the global defaults so that changes cascade
+@import 'bootstrap/variables';
 
 @import 'datatables/dataTables.bootstrap.css';
 
 @import 'datatables/colReorder.dataTables';
 @import 'datatables/responsive.dataTables';
-@import 'datatables/select.dataTables';
 
-table.data-table tbody {
-    tr.selected,
-	th.selected,
-	td.selected {
-        color: white;
+// @import 'compass/css3/border-radius';
 
-        a {
-            color: #a2d4ed;
-		}
-	}
-}
+// Responsive
+$open-button-background: #337ab7;    // TODO
+$close-button-background: #d33333;
+
+// ColReorder
+$colreorder-insert-color: $brand-secondary;
+
+// Select
+$table-selected: $brand-primary;
+// $table-selected: $brand-secondary;
+
+
 
 .entities {
-    tr {
-        cursor: pointer;
+    .dataTable thead {
+        > tr th {
+            border-top: 0;
+            border-bottom: 1px dotted $brand-primary;
+        }
+    }
+
+    .dataTable tbody {
+        border-top: 1px solid $brand-primary;
+
+        > tr {
+            cursor: pointer;
+
+            td {
+                border-top: 0;
+                border-bottom: 1px dotted $brand-primary;
+                // padding-bottom: 5px;
+            }
+
+            &:last-child td {
+                border-bottom-style: solid;
+            }
+        }
+
+
+        > tr:hover td,
+        > tr.selected td {
+            border-top-style: hidden;
+            border-bottom-style: none;
+            background-color: $table-selected;
+            // padding-bottom: 6px;
+            color: $brand-primary-light;
+    	}
+
+        > tr:hover td {
+            background-color: $table-bg-hover;
+        }
+
+        tr:hover td:first-child,
+        tr.selected td:first-child,
+        tr.selected:hover td:first-child {
+            border-top-style: hidden;
+            border-bottom-style: none;
+            border-radius: $border-radius-base 0 0 $border-radius-base;
+        }
+
+        tr:hover td:last-child,
+        tr.selected td:last-child,
+        tr.selected:hover td:last-child {
+            border-top-style: hidden;
+            border-bottom-style: none;
+            border-radius: 0 $border-radius-base $border-radius-base 0;
+        }
     }
 
     .glyphicon-remove {
