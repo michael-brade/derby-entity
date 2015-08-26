@@ -30,7 +30,8 @@
                         <!-- * this item could be a new item, so we cannot check for name being an object
                              * each entity has to have a name attribute
                         -->
-                        <d-select2 id="select2-{{#field.id}}" class="form-control" fixed multi="{{#field.multi}}"
+                        <d-select2 id="select2-{{#field.id}}" class="form-control" fixed
+                                   multi="{{#field.multi}}" uniq="{{#field.uniq}}"
                                    entities="{{repository.instance()}}" attribute="{{#field}}" locale="{{l($locale)}}"
                                    value="{{_page.item[#field.id]}}" />
                    </fieldgroup>
