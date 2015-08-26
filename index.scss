@@ -18,10 +18,6 @@ $close-button-background: #d33333;
 // ColReorder
 $colreorder-insert-color: $brand-secondary;
 
-// Select
-$table-selected: $brand-primary;
-// $table-selected: $brand-secondary;
-
 
 
 .entities {
@@ -54,7 +50,7 @@ $table-selected: $brand-primary;
         > tr.selected td {
             border-top-style: hidden;
             border-bottom-style: none;
-            background-color: $table-selected;
+            background-color: $table-bg-selected;
             // padding-bottom: 6px;
             color: $brand-primary-light;
     	}
