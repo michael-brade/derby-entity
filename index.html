@@ -16,11 +16,7 @@
 
     {{if _page.item}}
         <legend>
-            {{if _page.item.id}}
-                {{t($locale, 'actions.edit')}} {{t($locale, entity.id + '.one')}}
-            {{else}}
-                {{t($locale, 'actions.add')}} {{t($locale, entity.id + '.one')}}
-            {{/}}
+            {{t($locale, 'actions.edit')}} {{t($locale, entity.id + '.one')}}
         </legend>
 
         <form as="form" role="form" class="well form-horizontal" on-submit="done(this)">
@@ -51,26 +47,13 @@
             <div class="row">
                 <div class="col-xs-12">
                     <div class="pull-right">
-                        <button type="submit" class="btn btn-primary">
-                            {{if _page.item.id}}
-                                {{t($locale, 'actions.done')}}
-                            {{else}}
-                                {{t($locale, 'actions.add')}}
-                            {{/}}
-                        </button>
-
-                        {{unless _page.item.id}}
-                            &sp;
-                            <button type="button" class="btn btn-default" on-click="cancel()">
-                                {{t($locale, 'actions.cancel')}}
-                            </button>
-                        {{/}}
+                        <button type="submit" class="btn btn-primary">{{t($locale, 'actions.done')}}</button>
                     </div>
                 </div>
             </div>
         </form>
     {{else}}
-        <a class="btn btn-primary pull-right" href="{{pathFor(entity.id, 'new')}}" role="button">
+        <a class="btn btn-primary pull-right" on-click="add()" role="button">
             {{ t($locale, 'actions.new', { 'ITEM': t($locale, entity.id + '.one') }) }}
         </a>
     {{/}}

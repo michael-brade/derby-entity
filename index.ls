@@ -244,9 +244,7 @@ export class Entity
         # if app.history.push() is called with render, destroy() and create() are called, but the old listener is never removed!
 
         if @item.get!
-            @dtApi.select(@item.get().id)
-            $(@form).find(':input[type!=hidden]').first().focus()
-            @startValidation!
+            @select!
 
 
     /* Called when leaving the "page".
@@ -321,42 +319,41 @@ export class Entity
             if !@item.get()
                 @app.history.push(@app.pathFor(@getAttribute("entity").id, 'new'))
 
-        | 27 => @cancel!
+        | 27 => @deselect!
 
 
 
     # The following functions can be called from the view
 
+    /** Create a new item. */
+    add: !->
+        id = @items.add {}
+        @select id
+        #@emit("added" + @getAttribute("entity").id, newItem)
 
-    /* Add a new entity.
-     *
-     * When called as "add(this)" from the view, "this", the argument, will be the object with the current model data,
+
+    /* When called as "done(this)" from the view, "this", the argument, will be the object with the current model data,
      * which is the same as this.model.data
      */
     done: (entity) !->
         # entity == this.model.data
-        #console.log("userid " + @model.root.get('_session.userId'))
-
-        newItem = @item.get!
-
-        if newItem && !newItem.id  # add only if exists and not in db yet
-            @items.add newItem
-            #@emit("added" + @getAttribute("entity").id, newItem)
-
-            @entityMessage newItem, 'messages.entityAdded'
-
         @deselect!
 
 
     select: (id) ->
-        if @item.get("id") == id    # if id is already selected, deselect
+        if not id
+            @dtApi.select(@item.get().id)
+        else if @item.get("id") == id    # if id is already selected, deselect
             @deselect!
+            return
         else
             # otherwise @item points to the selected item and the first input is focused
             @item.ref(@items.at(id))
-            $(@form).find(':input[type!=hidden]').first().focus()
             @app.history.push(@app.pathFor(@getAttribute("entity").id, id), false)
+
+            $(@form).find(':input[type!=hidden]').first().focus()
             @startValidation!
+
 
     deselect: (push = true) ->
         @dtApi.deselect!
@@ -390,8 +387,6 @@ export class Entity
 
         @entityMessage item, 'messages.entityDeleted'
 
-    cancel: ->
-        @deselect!
 
     entityMessage: (item, message) ->
         loc = @model.get("$locale")
