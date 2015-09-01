@@ -61,7 +61,7 @@ export class Entity
      *  this.app.model is global model
      */
     create: (model, dom) ->
-        #console.log("Entity.create: ", @getAttribute("entity").id)
+        # console.log("Entity.create: ", @getAttribute("entity").id)
 
         #dom.on 'keydown', (e) ~>   # this registers several dom listeners
 
@@ -140,10 +140,6 @@ export class Entity
 
                 *   targets: "attr"
                     data:  (data, type, value, meta) ~>
-                        #console.log("render:", @, data, type, full, meta)
-                        #console.log "entity:", @getAttribute("entity")
-                        #console.log "attrib:", @getAttribute("entity").attributes[meta.col - 1]
-
                         if type == 'set'
                             console.warn "setting values not supported!"
                             return
@@ -196,6 +192,9 @@ export class Entity
         #   "" if a new item was added
         #   undefined if an item was deleted
         model.on "change", "_page.items.*.**", (rowindex, path, cur, old) ~>
+            # $(rowNode)
+            #     .css( 'background-color', 'red' )
+            #     .animate { 'background-color': 'white' }
             return if not path
             # id = model.get("_page.items." + rowindex).id(true)
             # row = @dtApi.row(id)
@@ -231,10 +230,6 @@ export class Entity
                 row = @dtApi.row.add(item)
                 requestAnimationFrame !-> row.draw!
 
-            # $(rowNode)
-            #     .css( 'background-color', 'red' )
-            #     .animate { 'background-color': 'white' }
-
         model.on "remove", "_page.items", (rowindex, removed) ~>
             row = @dtApi.row(rowindex).remove!
             requestAnimationFrame !-> row.draw!
@@ -255,7 +250,7 @@ export class Entity
      */
     destroy: (model, dom) ->
         # TODO: Bug: dom is always null!
-        #console.log("Entity.destroy: ", @getAttribute("entity").id, dom)
+        # console.log("Entity.destroy: ", @getAttribute("entity").id, dom)
 
         $(document).off 'keydown'
 
@@ -282,25 +277,6 @@ export class Entity
                 @dtApi.deselect!
                 $row.addClass('selected')
                 @select itemId
-
-
-
-        # blur: clicking outside of the table deselects
-        # $('body').on 'click.dtSelect', (e) ~>
-        #     #console.log e, $(e.target).parents()
-        #
-        #     # if the click was inside the DataTables container, don't blur
-        #     return if $(e.target).parents().filter( @dtApi.table().container() ).length
-        #
-        #     # don't blur in edit form
-        #     return if e.target == @form
-        #         or $(e.target).parents().filter(@form).length
-        #         or $(e.target).parents('.select2-container').length             # select2-container is in body
-        #         or $(e.target).hasClass('select2-selection__choice__remove')    # TODO: why isn't .filter(@form) enough?
-        #
-        #     # only blur if an element was selected
-        #     if @item.get!
-        #         @deselect!
 
 
     enableMouseDeletion: ->
