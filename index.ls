@@ -277,7 +277,6 @@ export class Entity
             itemId = @dtApi.row(rowIdx).data().id
 
             if $row.hasClass('selected')
-                @dtApi.deselect!
                 @deselect!
             else
                 @dtApi.deselect!
@@ -317,7 +316,8 @@ export class Entity
         | 13 =>
             # no form shown yet -> start new item
             if !@item.get()
-                @app.history.push(@app.pathFor(@getAttribute("entity").id, 'new'))
+                e.preventDefault!
+                @add!
 
         | 27 => @deselect!
 
@@ -342,7 +342,7 @@ export class Entity
 
     select: (id) ->
         if not id
-            @dtApi.select(@item.get().id)
+            id = @item.get().id
         else if @item.get("id") == id    # if id is already selected, deselect
             @deselect!
             return
@@ -351,8 +351,9 @@ export class Entity
             @item.ref(@items.at(id))
             @app.history.push(@app.pathFor(@getAttribute("entity").id, id), false)
 
-            $(@form).find(':input[type!=hidden]').first().focus()
-            @startValidation!
+        @dtApi.select(id)
+        $(@form).find(':input[type!=hidden]').first().focus()
+        @startValidation!
 
 
     deselect: (push = true) ->
