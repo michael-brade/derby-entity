@@ -163,7 +163,7 @@ export class Entity
                     searchable: false
                     data: "id"
                     render: (data, type, full, meta) ->
-                        return '<span class="action-remove glyphicon glyphicon-remove"></span>'
+                        return '<span class="action-remove"><i class="fa fa-remove"></i></span>'
             ]
 
 
