@@ -151,7 +151,7 @@ export class Entity
                             api = meta.settings.oInstance.api(true)
                             $(api.cell(meta.row, meta.col).node()).css("background-color", data[attr.id])
 
-                        return @repository.getItemAttr data, attr.id, @getAttribute("entity").id    # TODO: , locale!!!
+                        return @repository.getItemAttr data, attr.id, @getAttribute("entity").id, @page.l(@model.get("$locale"))
 
                 *   targets: "actions"
                     className: "actions"
@@ -180,11 +180,12 @@ export class Entity
 
         model.on "all", "_page.items.*.**", (rowindex, pathsegment, event) ~>
             console.log("all", arguments)
-            $(@table).DataTable().state.save()
+            #@dtApi.state.save()
 
         # locale changes
-        model.on "all", "$locale.**", (index, removed) ~>
-            $(@table).DataTable().state.save()
+        model.on "all", "$locale.**", ~>
+            console.log("locale!!", arguments)
+            @dtApi.rows().invalidate().draw()
 
 
         # this finds the correct row to invalidate after a change
@@ -198,10 +199,7 @@ export class Entity
             return if not path
             # id = model.get("_page.items." + rowindex).id(true)
             # row = @dtApi.row(id)
-            row = @dtApi.row(rowindex)
-            item = row.data!
-            _.set(item, path, cur)
-            row.invalidate!
+            row = @dtApi.row(rowindex).invalidate!
             requestAnimationFrame !-> row.draw!   # requestAnimationFrame because draw is slow
 
         # the following three are array events
@@ -217,10 +215,6 @@ export class Entity
         model.on "remove", "_page.items.*.**", (rowindex, path, iPos) ~>
             row = @dtApi.row(rowindex).invalidate!
             requestAnimationFrame !-> row.draw!
-
-        # TODO: when is this called??
-        model.on "change", "_page.items", (index, values) ~>
-            console.log "change items: ", arguments
 
 
         # insert and remove -- first the captures, then the rest
