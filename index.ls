@@ -178,48 +178,27 @@ export class Entity
 
         #model.on "all", "**", -> console.log(arguments)
 
-        model.on "all", "_page.items.*.**", (rowindex, pathsegment, event) ~>
-            console.log("all", arguments)
+        model.on "all", "_page.items.*.**", (rowindex, path, event) ~>
+            # on "change" events, the path is:
+        #   "" if a new item was added
+        #   undefined if an item was deleted
+            return if not path
+
+            # no need to modify table data, we have the data getter in columnDefs
+            row = @dtApi.row(rowindex).invalidate!
+            requestAnimationFrame !-> row.draw!
+
             #@dtApi.state.save()
 
         # locale changes
         model.on "all", "$locale.**", ~>
-            console.log("locale!!", arguments)
             @dtApi.rows().invalidate().draw()
 
-
-        # this finds the correct row to invalidate after a change
-        # path is:
-        #   "" if a new item was added
-        #   undefined if an item was deleted
-        model.on "change", "_page.items.*.**", (rowindex, path, cur, old) ~>
-            # $(rowNode)
-            #     .css( 'background-color', 'red' )
-            #     .animate { 'background-color': 'white' }
-            return if not path
-            # id = model.get("_page.items." + rowindex).id(true)
-            # row = @dtApi.row(id)
-            row = @dtApi.row(rowindex).invalidate!
-            requestAnimationFrame !-> row.draw!   # requestAnimationFrame because draw is slow
-
-        # the following three are array events
-        model.on "move", "_page.items.*.**", (rowindex, path, iFrom, iTo, howMany) ~>
-            row = @dtApi.row(rowindex).invalidate!
-            # no need to move the element in the table data, for the array is a reference
-            requestAnimationFrame !-> row.draw!
-
-        model.on "insert", "_page.items.*.**", (rowindex, path, iPos) ~>
-            row = @dtApi.row(rowindex).invalidate!
-            requestAnimationFrame !-> row.draw!
-
-        model.on "remove", "_page.items.*.**", (rowindex, path, iPos) ~>
-            row = @dtApi.row(rowindex).invalidate!
-            requestAnimationFrame !-> row.draw!
 
 
         # insert and remove -- first the captures, then the rest
         # items is an array
-        model.on "insert", "_page.items", (index, items) ~>
+        model.on "insert", "_page.items", (rowindex, items) ~>
             for item in items
                 row = @dtApi.row.add(item)
                 requestAnimationFrame !-> row.draw!
@@ -263,7 +242,7 @@ export class Entity
 
             rowIdx = cell.index().row
             $row = @dtApi.rows(rowIdx).nodes().to$()
-            itemId = @dtApi.row(rowIdx).data().id
+            itemId = @dtApi.row(rowIdx).id()
 
             if $row.hasClass('selected')
                 @deselect!
