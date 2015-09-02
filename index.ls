@@ -282,7 +282,7 @@ export class Entity
     enableMouseDeletion: ->
         $tbody = $(@dtApi.table().body())
         $tbody.on 'click', 'tr > td.actions .action-remove', (e) ~>
-            @remove @dtApi.row( $(e.target).parents('tr') ).id!
+            @showDeleteModal @dtApi.row( $(e.target).parents('tr') ).data!
 
 
     keyActions: (e) ->
@@ -343,6 +343,17 @@ export class Entity
                 @app.history.push(@app.pathFor(@getAttribute("entity").id), false)
             else
                 @app.history.replace(@app.pathFor(@getAttribute("entity").id), false)
+
+
+    showDeleteModal: (item) ->
+        @model.set "_page.itemToBeDeleted", item
+        @deleteModal.show!
+
+    closeDeleteModal: (action, closeCallback) ->
+        if action == 'delete'
+            @remove @model.get("_page.itemToBeDeleted.id")
+
+        closeCallback!
 
     remove: (id) ->
         # check if the item to be deleted is still referenced

@@ -59,6 +59,20 @@
     {{/}}
 
 
+    <!-- Modal Dialogs -->
+
+    <modal as="deleteModal" on-close="closeDeleteModal()">
+        <title>Delete {{t($locale, entity.id + '.one')}}</title>
+
+        Do you really want to delete this <em>{{t($locale, entity.id + '.one')}}</em>?
+        <p class="text-center">
+            <strong>{{repository.getItemAttr(_page.itemToBeDeleted, "name", entity.id, l($locale))}}</strong>
+        </p>
+
+        <action class="btn-primary" name='delete' autofocus default>Delete</action>
+        <action name='cancel'>Cancel</action>
+    </modal>
+
 
 <!-- Arguments: id, label, type, value
 -->
