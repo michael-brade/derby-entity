@@ -62,15 +62,15 @@
     <!-- Modal Dialogs -->
 
     <modal as="deleteModal" on-close="closeDeleteModal()">
-        <title>Delete {{t($locale, entity.id + '.one')}}</title>
+        <title>{{t($locale, 'dialogs.deleteEntityTitle', { 'ENTITY': t($locale, entity.id + '.one') })}}</title>
 
-        Do you really want to delete this <em>{{t($locale, entity.id + '.one')}}</em>?
+        {{t($locale, 'messages.deleteEntity', { 'ENTITY': t($locale, entity.id + '.one') })}}
         <p class="text-center">
             <strong>{{repository.getItemAttr(_page.itemToBeDeleted, "name", entity.id, l($locale))}}</strong>
         </p>
 
-        <action class="btn-primary" name='delete' autofocus default>Delete</action>
-        <action name='cancel'>Cancel</action>
+        <action name='delete' class="btn-primary" autofocus default>{{t($locale, 'actions.delete')}}</action>
+        <action name='cancel'>{{t($locale, 'actions.cancel')}}</action>
     </modal>
 
 
