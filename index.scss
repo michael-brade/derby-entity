@@ -50,6 +50,11 @@ $colreorder-insert-color: $brand-secondary;
             }
         }
 
+        // cursor
+        tbody > tr > td:not(.actions) {
+            cursor: pointer;
+        }
+
         thead {
             > tr > th {
                 border-top: 0;
@@ -61,8 +66,6 @@ $colreorder-insert-color: $brand-secondary;
             border-top: 1px solid $brand-primary;
 
             > tr {
-                cursor: pointer;
-
                 > td {
                     border-top: 0;
                     border-bottom: 1px dotted $brand-primary;
@@ -104,9 +107,5 @@ $colreorder-insert-color: $brand-secondary;
                 border-radius: 0 $border-radius-base $border-radius-base 0;
             }
         }
-    }
-
-    .glyphicon-remove {
-        cursor: default;
     }
 }
