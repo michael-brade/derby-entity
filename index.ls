@@ -21,6 +21,8 @@ export class Entity
     view: __dirname
     style: __dirname
 
+    components: [require('../modal')]
+
     # if declared here (part of the prototype), these are not private and visible in the view!
     repository: null
 
