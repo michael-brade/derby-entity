@@ -294,10 +294,20 @@ export class Entity
 
         $tbody.on 'click', '> tr > td.actions .action-references', (e) ~>
             @repository.fetchAllReferencingEntities @getAttribute("entity").id, (err) ->
-                e.currentTarget = e.target  # fix to center the popover over the icon; currentTarget is never the span
+                # fix to center the popover over the icon; currentTarget is never the span
+                e.currentTarget = e.target
+
                 $tbody.popover('toggle', e)
-                $(e.target).parents('tr').one 'mouseleave', (eDummy) ->
-                    $tbody.popover('toggle', e)
+
+                # only register one() once -- better: provide a popover('hide', e)!
+                $tr = $(e.target).parents('tr')
+                if $.hasData($tr[0])
+                    and (events = $._data( $tr[0], 'events' ))
+                    and events.mouseout
+                    and _.find(events.mouseout, (evt) -> evt.namespace == 'entity.popover')
+                        $tr.off 'mouseout.entity.popover'
+                else
+                    $tr.one 'mouseout.entity.popover', -> $tbody.popover('toggle', e)
 
 
     keyActions: (e) ->
