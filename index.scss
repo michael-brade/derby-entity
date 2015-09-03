@@ -21,6 +21,15 @@ $colreorder-insert-color: $brand-secondary;
 
 
 .entities {
+    .popover {
+        max-width: none;
+        white-space: nowrap;
+
+        ul {
+            padding-left: 16px;
+        }
+    }
+
     table.dataTable.table-condensed {
         // sort icons
         thead {

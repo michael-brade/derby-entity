@@ -161,7 +161,8 @@ export class Entity
                     searchable: false
                     data: "id"
                     render: (data, type, full, meta) ->
-                        return '<span class="action-remove"><i class="fa fa-remove"></i></span>'
+                        return '<span class="action-references"><i class="fa fa-external-link"></i></span>&nbsp;' +
+                               '<span class="action-remove"><i class="fa fa-remove"></i></span>'
             ]
 
 
@@ -174,7 +175,7 @@ export class Entity
         @dtApi = $(@table).DataTable(settings)
 
         @enableMouseSelection 'td:not(.control, .actions)'
-        @enableMouseDeletion!
+        @enableActions!
 
         # EVENT REGISTRATION
 
@@ -182,8 +183,8 @@ export class Entity
 
         model.on "all", "_page.items.*.**", (rowindex, path, event) ~>
             # on "change" events, the path is:
-        #   "" if a new item was added
-        #   undefined if an item was deleted
+            #   "" if a new item was added
+            #   undefined if an item was deleted
             return if not path
 
             # no need to modify table data, we have the data getter in columnDefs
@@ -253,11 +254,50 @@ export class Entity
                 $row.addClass('selected')
                 @select itemId
 
-
-    enableMouseDeletion: ->
+    enableActions: !->
         $tbody = $(@dtApi.table().body())
+
+        # delete
         $tbody.on 'click', 'tr > td.actions .action-remove', (e) ~>
             @showDeleteModal @dtApi.row( $(e.target).parents('tr') ).data!
+
+        # references
+        entity = this
+        $tbody.popover(
+            placement: 'top'
+            selector: 'span.action-references i'
+            container: '#' + entity.getAttribute("entity").id
+            viewport:
+                selector: '#' + entity.getAttribute("entity").id
+                padding: 0
+
+            trigger: 'manual'
+
+            html: true
+            title: ->
+                item = entity.dtApi.row( $(this).parents('tr') ).data!
+                name = entity.getItemName item
+                "Referencing <em>#{name}</em> are:"
+
+            content: ->
+                id = entity.dtApi.row( $(this).parents('tr') ).id!
+                loc = entity.model.get("$locale")
+
+                if entity.repository.itemReferences id, entity.getAttribute("entity").id
+                    referencees = "<ul>"
+                    for usage in that
+                        referencees += "<li>" + entity.page.t(loc, usage.entity + '.one') + ": " + usage.item + "</li>"
+                    return referencees + "</ul>"
+
+                "This #{entity.page.t(loc, entity.getAttribute("entity").id + '.one')} is not referenced."
+        )
+
+        $tbody.on 'click', '> tr > td.actions .action-references', (e) ~>
+            @repository.fetchAllReferencingEntities @getAttribute("entity").id, (err) ->
+                e.currentTarget = e.target  # fix to center the popover over the icon; currentTarget is never the span
+                $tbody.popover('toggle', e)
+                $(e.target).parents('tr').one 'mouseleave', (eDummy) ->
+                    $tbody.popover('toggle', e)
 
 
     keyActions: (e) ->
@@ -351,13 +391,16 @@ export class Entity
         @entityMessage item, 'messages.entityDeleted'
 
 
+    getItemName: (item) ->
+        @repository.getItemAttr item, 'name', @getAttribute("entity").id, @page.l(@model.get("$locale"))
+
+
     entityMessage: (item, message) ->
         loc = @model.get("$locale")
-        itemName = @repository.getItemAttr(item, 'name', @getAttribute("entity").id, @page.l(loc))
 
         @model.toast('success', @page.t(loc, message, {
             'ENTITY': @page.t(loc, @getAttribute("entity").id + '.one')
-            'ITEM': itemName
+            'ITEM': @getItemName item
         }))
 
     startValidation: ->
