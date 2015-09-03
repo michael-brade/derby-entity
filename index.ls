@@ -277,7 +277,7 @@ export class Entity
             title: ->
                 item = entity.dtApi.row( $(this).parents('tr') ).data!
                 name = entity.getItemName item
-                "Referencing <em>#{name}</em> are:"
+                entity.page.t(entity.model.get("$locale"), 'dialogs.referencePopoverTitle', { ITEM: name })
 
             content: ->
                 id = entity.dtApi.row( $(this).parents('tr') ).id!
@@ -289,7 +289,9 @@ export class Entity
                         referencees += "<li>" + entity.page.t(loc, usage.entity + '.one') + ": " + usage.item + "</li>"
                     return referencees + "</ul>"
 
-                "This #{entity.page.t(loc, entity.getAttribute("entity").id + '.one')} is not referenced."
+                entity.page.t(loc, 'dialogs.referencePopoverUnused', {
+                    ENTITY: entity.page.t(loc, entity.getAttribute("entity").id + '.one')
+                })
         )
 
         $tbody.on 'click', '> tr > td.actions .action-references', (e) ~>
@@ -383,10 +385,12 @@ export class Entity
     remove: (id) ->
         # check if the item to be deleted is still referenced
         if @repository.itemReferences id, @getAttribute("entity").id
-            usages = ""
+            usages = "<ul>"
             loc = @model.get("$locale")
             for usage in that
-                usages += "<br> * " + @page.t(loc, usage.entity + '.one') + " " + usage.item
+                usages += "<li>" + @page.t(loc, usage.entity + '.one') + ": " + usage.item + "</li>"
+
+            usages += "</ul>"
 
             @model.toast('error', @page.t(loc, 'messages.itemReferenced', { 'ENTITY': @page.t(loc, @getAttribute("entity").id + '.one') }) + usages)
             return
