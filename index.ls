@@ -75,16 +75,16 @@ export class Entity
         require('datatables.responsive')
         require('datatables.colVis')
         require('datatables.colReorder')
+        require('datatables.colResize')
 
-        #$(@table).DataTable(
         settings =
             autowidth: true    # takes cpu, see also column.width
             #lenghthChange: false
 
-            dom: "t" # 'C<"clear">t' for ColVis
+            dom: "Zft" # 'C<"clear">' for ColVis, Z for ColResize
             info: false
             paging: false
-            searching: false
+            searching: true
 
             colReorder:
                 fixedColumnsLeft: 1
