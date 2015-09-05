@@ -166,9 +166,13 @@ export class Entity
 
 
         $.fn.dataTable.Api.register 'deselect()', ->
-            this.$('tr.selected').removeClass('selected')
+            $tr = this.$('tr.selected').addClass('animate-selection')
+            requestAnimationFrame -> $tr.removeClass('selected')
+            setTimeout (-> $tr.removeClass('animate-selection')), 1000      # don't use transitionend because it can be prolonged with the mouse!
+            return $tr
 
         $.fn.dataTable.Api.register 'select()', (itemId) ->
+            this.$('.animate-selection').removeClass('animate-selection')   # don't animate deselect if we just change the selection
             this.$('tr#' + itemId).addClass('selected')
 
         @dtApi = $(@table).DataTable(settings)
@@ -359,9 +363,15 @@ export class Entity
 
 
     deselect: (push = true) ->
-        @dtApi.deselect!
+        $tr = @dtApi.deselect!
         @stopValidation!
         @item.removeRef!
+
+        # scroll back into view - TODO: use DataTables row().show() plugin and this to it? needed for paging tables
+        $tr[0].scrollIntoView!
+        if $tr.offset().top - $('body').scrollTop! < $(window).height() / 3
+            document.body.scrollTop -= $(window).height() / 3
+
         # in case of done(): Wait for all model changes to go through before going to the next page, mainly because
         # in non-single-page-app mode (basically IE < 10) we want changes to save to the server before leaving the page
         @model.whenNothingPending ~>

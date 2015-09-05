@@ -21,6 +21,12 @@ $colreorder-insert-color: $brand-secondary;
 
 
 .entities {
+    .animate-selection td {
+        transition-property: background-color, color;
+        transition-duration: .5s;
+        transition-delay: .3s;
+    }
+
     .popover {
         max-width: none;
         white-space: nowrap;
