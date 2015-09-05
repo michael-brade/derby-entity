@@ -76,6 +76,8 @@ export class Entity
         require('datatables.colVis')
         require('datatables.colReorder')
         require('datatables.colResize')
+        require('jquery.highlight')
+        require('datatables.searchHighlight')
 
         settings =
             autowidth: true    # takes cpu, see also column.width
@@ -85,6 +87,7 @@ export class Entity
             info: false
             paging: false
             searching: true
+            searchHighlight: true
 
             colReorder:
                 fixedColumnsLeft: 1

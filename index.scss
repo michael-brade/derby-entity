@@ -30,6 +30,13 @@ $colreorder-insert-color: $brand-secondary;
         }
     }
 
+
+    table.dataTable span.highlight {
+      //background-color: $brand-info;
+      background-color: $brand-aux-1-med-light;
+    }
+
+
     table.dataTable.table-condensed {
         // sort icons
         thead {
