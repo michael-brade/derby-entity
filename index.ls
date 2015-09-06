@@ -69,7 +69,6 @@ export class Entity
 
         $(document).keydown (e) ~> @keyActions.call(@, e)
 
-        # init the table
         require('datatables')
         require('datatables.bootstrap')
         require('datatables.responsive')
@@ -78,7 +77,81 @@ export class Entity
         require('jquery.highlight')
         require('datatables.searchHighlight')
 
+        $.fn.dataTable.Api.register 'deselect()', ->
+            $tr = this.$('tr.selected').addClass('animate-selection')
+            requestAnimationFrame -> $tr.removeClass('selected')
+            setTimeout (-> $tr.removeClass('animate-selection')), 1000      # don't use transitionend because it can be prolonged with the mouse!
+            return $tr
+
+        $.fn.dataTable.Api.register 'select()', (itemId) ->
+            this.$('.animate-selection').removeClass('animate-selection')   # don't animate deselect if we just change the selection
+            this.$('tr#' + itemId).addClass('selected')
+
+        # init the table
+        @createTable!
+
+
+        # EVENT REGISTRATION
+
+        #model.on "all", "**", -> console.log(arguments)
+
+        model.on "all", "_page.items.*.**", (rowindex, path, event) ~>
+            # on "change" events, the path is:
+            #   "" if a new item was added
+            #   undefined if an item was deleted
+            return if not path
+
+            # no need to modify table data, we have the data getter in columnDefs
+            row = @dtApi.row(rowindex).invalidate!
+            requestAnimationFrame !-> row.draw!
+
+            #@dtApi.state.save()
+
+        # locale changes
+        model.on "all", "$locale.**", ~>
+            #@dtApi.rows().invalidate().draw()
+            @dtApi.state.save()
+            model.increment '_page.recreateTable'
+            requestAnimationFrame !~> @createTable!
+
+
+
+        # insert and remove -- first the captures, then the rest
+        # items is an array
+        model.on "insert", "_page.items", (rowindex, items) ~>
+            for item in items
+                row = @dtApi.row.add(item)
+                requestAnimationFrame !-> row.draw!
+
+        model.on "remove", "_page.items", (rowindex, removed) ~>
+            row = @dtApi.row(rowindex).remove!
+            requestAnimationFrame !-> row.draw!
+
+
+
+        # if app.history.push() is called with render, destroy() and create() are called, but the old listener is never removed!
+
+        if @item.get!
+            @select!
+
+
+    /* Called when leaving the "page" with the Entity component.
+     *
+     *   - release memory
+     *   - stop reactive functions
+     *   - remove client libraries
+     */
+    destroy: (model, dom) ->
+        # TODO: Bug: dom is always null!
+        # console.log("Entity.destroy: ", @getAttribute("entity").id, dom)
+
+        $(document).off 'keydown'
+
+
+
+    createTable: ->
         settings =
+            language: @model.root.get("$lang.dict.strings." + @page.l(@model.get("$locale")) + ".dataTables")
             autowidth: true    # takes cpu, see also column.width
             #lenghthChange: false
 
@@ -170,74 +243,10 @@ export class Entity
             ]
 
 
-        $.fn.dataTable.Api.register 'deselect()', ->
-            $tr = this.$('tr.selected').addClass('animate-selection')
-            requestAnimationFrame -> $tr.removeClass('selected')
-            setTimeout (-> $tr.removeClass('animate-selection')), 1000      # don't use transitionend because it can be prolonged with the mouse!
-            return $tr
-
-        $.fn.dataTable.Api.register 'select()', (itemId) ->
-            this.$('.animate-selection').removeClass('animate-selection')   # don't animate deselect if we just change the selection
-            this.$('tr#' + itemId).addClass('selected')
-
         @dtApi = $(@table).DataTable(settings)
 
         @enableMouseSelection 'td:not(.control, .actions)'
         @enableActions!
-
-        # EVENT REGISTRATION
-
-        #model.on "all", "**", -> console.log(arguments)
-
-        model.on "all", "_page.items.*.**", (rowindex, path, event) ~>
-            # on "change" events, the path is:
-            #   "" if a new item was added
-            #   undefined if an item was deleted
-            return if not path
-
-            # no need to modify table data, we have the data getter in columnDefs
-            row = @dtApi.row(rowindex).invalidate!
-            requestAnimationFrame !-> row.draw!
-
-            #@dtApi.state.save()
-
-        # locale changes
-        model.on "all", "$locale.**", ~>
-            @dtApi.rows().invalidate().draw()
-
-
-
-        # insert and remove -- first the captures, then the rest
-        # items is an array
-        model.on "insert", "_page.items", (rowindex, items) ~>
-            for item in items
-                row = @dtApi.row.add(item)
-                requestAnimationFrame !-> row.draw!
-
-        model.on "remove", "_page.items", (rowindex, removed) ~>
-            row = @dtApi.row(rowindex).remove!
-            requestAnimationFrame !-> row.draw!
-
-
-
-        # if app.history.push() is called with render, destroy() and create() are called, but the old listener is never removed!
-
-        if @item.get!
-            @select!
-
-
-    /* Called when leaving the "page".
-     *
-     *   - release memory
-     *   - stop reactive functions
-     *   - remove client libraries
-     */
-    destroy: (model, dom) ->
-        # TODO: Bug: dom is always null!
-        # console.log("Entity.destroy: ", @getAttribute("entity").id, dom)
-
-        $(document).off 'keydown'
-
 
 
     enableMouseSelection: (selector) ->
