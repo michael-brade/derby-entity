@@ -10,7 +10,7 @@
 @import 'datatables/colReorder.dataTables';
 @import 'datatables/responsive.dataTables';
 
-// @import 'compass/css3/border-radius';
+@import 'compass/css3/border-radius';
 
 // Responsive
 $open-button-background: #337ab7;    // TODO
@@ -19,6 +19,15 @@ $close-button-background: #d33333;
 // ColReorder
 $colreorder-insert-color: $brand-secondary;
 
+@mixin round-corners() {
+    &:first-child {
+        @include border-radius($border-radius-base 0 0 $border-radius-base);
+    }
+
+    &:last-child {
+        @include border-radius(0 $border-radius-base $border-radius-base 0);
+    }
+}
 
 .entities {
     .animate-selection td {
@@ -46,8 +55,8 @@ $colreorder-insert-color: $brand-secondary;
     table.dataTable.table-condensed {
         > thead {
             > tr > th {
-                // border-top: 0;
-                // border-bottom: 1px dotted $brand-primary;
+                @include round-corners();
+                border: 0;
                 background-color: $brand-primary;
 
                 // sort icons
@@ -89,11 +98,9 @@ $colreorder-insert-color: $brand-secondary;
 
 
         > tbody {
-            border-top: 1px solid $brand-primary;
-
             > tr {
                 > td {
-                    border-top: 1px dotted $brand-primary;
+                    border-top: 1px dotted $brand-primary-light;        // TODO: try opacify() with solid/double
                     border-bottom: 1px dotted $brand-primary;
                 }
 
@@ -113,7 +120,7 @@ $colreorder-insert-color: $brand-secondary;
                 &:hover > td,
                 &.selected > td {
                     border-top: 1px solid $brand-primary-light;    // solid is more specific than dotted
-                    border-bottom-color: $brand-primary-light;
+                    border-bottom: 1px solid $brand-primary-light;
 
                     background-color: $table-bg-selected;
                     color: $brand-primary-light;
@@ -126,13 +133,8 @@ $colreorder-insert-color: $brand-secondary;
                 &:hover,
                 &.selected,
                 &.selected:hover {
-
-                    > td:first-child {
-                        border-radius: $border-radius-large 0 0 $border-radius-large;
-                    }
-
-                    > td:last-child {
-                        border-radius: 0 $border-radius-large $border-radius-large 0;
+                    td {
+                        @include round-corners();
                     }
                 }
             }
