@@ -73,7 +73,6 @@ export class Entity
         require('datatables')
         require('datatables.bootstrap')
         require('datatables.responsive')
-        require('datatables.colVis')
         require('datatables.colReorder')
         require('datatables.colResize')
         require('jquery.highlight')
@@ -83,7 +82,7 @@ export class Entity
             autowidth: true    # takes cpu, see also column.width
             #lenghthChange: false
 
-            dom: "Zft" # 'C<"clear">' for ColVis, Z for ColResize
+            dom: "Zft" # Z for ColResize
             info: false
             paging: false
             searching: true
@@ -91,9 +90,6 @@ export class Entity
 
             colReorder:
                 fixedColumnsLeft: 1
-
-            colVis:
-                aiExclude: [ 0 ]
 
             #scrollY: 300
             #scrollCollapse: true
