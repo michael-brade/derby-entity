@@ -145,12 +145,17 @@ export class Entity
                             console.warn "setting values not supported!"
                             return
 
-                        attr = @getAttribute("entity").attributes[meta.col - 1]
+                        api = meta.settings.oInstance.api(true)
+                        col = meta.col #api.colReorder.order()[meta.col]
+                        try
+                            col = api.colReorder.order()[meta.col]
+                        catch e
+
+                        attr = @getAttribute("entity").attributes[col - 1]
                         return "err" if not attr
 
                         if type == 'display' and attr.type == 'color'
-                            api = meta.settings.oInstance.api(true)
-                            $(api.cell(meta.row, meta.col).node()).css("background-color", data[attr.id])
+                            $(api.cell(meta.row, col).node()).css("background-color", data[attr.id])
 
                         return @repository.getItemAttr data, attr.id, @getAttribute("entity").id, @page.l(@model.get("$locale"))
 
