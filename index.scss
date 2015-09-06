@@ -44,9 +44,13 @@ $colreorder-insert-color: $brand-secondary;
 
 
     table.dataTable.table-condensed {
-        // sort icons
-        thead {
+        > thead {
             > tr > th {
+                // border-top: 0;
+                // border-bottom: 1px dotted $brand-primary;
+                background-color: $brand-primary;
+
+                // sort icons
                 padding-right: 5px;
 
                 &.sorting:after,
@@ -58,12 +62,23 @@ $colreorder-insert-color: $brand-secondary;
                     position: static;
                     padding-left: 5px;
                 }
+
+                &.sorting:after {
+                    opacity: 0.5;
+                    color: $brand-primary-light;
+                }
             }
         }
 
+        // sort columns
+        > tbody > tr > td.sorting_1 {
+            background-color: #fcf8e3;    // TODO: use variable, darken $brand-primary-light?
+        }
+
+
         // responsive icons
-        &.dtr-column > tbody > tr > td.control,
-        &.dtr-column > tbody > tr > th.control {
+        &.dtr-column > tbody > tr > th.control,
+        &.dtr-column > tbody > tr > td.control {
             width: 12px;
 
             &:before {
@@ -72,26 +87,14 @@ $colreorder-insert-color: $brand-secondary;
             }
         }
 
-        // cursor
-        tbody > tr > td:not(.actions) {
-            cursor: pointer;
-        }
 
-        thead {
-            > tr > th {
-                border-top: 0;
-                border-bottom: 1px dotted $brand-primary;
-            }
-        }
-
-        tbody {
+        > tbody {
             border-top: 1px solid $brand-primary;
 
             > tr {
                 > td {
-                    border-top: 0;
+                    border-top: 1px dotted $brand-primary;
                     border-bottom: 1px dotted $brand-primary;
-                    // padding-bottom: 5px;
                 }
 
                 &:last-child > td {
@@ -99,34 +102,42 @@ $colreorder-insert-color: $brand-secondary;
                 }
             }
 
+            > tr:not(.child) {
+                // cursor
+                > td:not(.actions) {
+                    cursor: pointer;
+                }
 
-            > tr:hover > td,
-            > tr.selected > td {
-                border-top-style: hidden;
-                border-bottom-style: none;
-                background-color: $table-bg-selected;
-                // padding-bottom: 6px;
-                color: $brand-primary-light;
-        	}
+                // hover, selected, and round borders
 
-            > tr:hover > td {
-                background-color: $table-bg-hover;
+                &:hover > td,
+                &.selected > td {
+                    border-top: 1px solid $brand-primary-light;    // solid is more specific than dotted
+                    border-bottom-color: $brand-primary-light;
+
+                    background-color: $table-bg-selected;
+                    color: $brand-primary-light;
+                }
+
+                &:hover > td {
+                    background-color: $table-bg-hover;
+                }
+
+                &:hover,
+                &.selected,
+                &.selected:hover {
+
+                    > td:first-child {
+                        border-radius: $border-radius-large 0 0 $border-radius-large;
+                    }
+
+                    > td:last-child {
+                        border-radius: 0 $border-radius-large $border-radius-large 0;
+                    }
+                }
             }
 
-            > tr:hover > td:first-child,
-            > tr.selected > td:first-child,
-            > tr.selected:hover > td:first-child {
-                border-top-style: hidden;
-                border-bottom-style: none;
-                border-radius: $border-radius-base 0 0 $border-radius-base;
-            }
-
-            > tr:hover > td:last-child,
-            > tr.selected > td:last-child,
-            > tr.selected:hover > td:last-child {
-                border-top-style: hidden;
-                border-bottom-style: none;
-                border-radius: 0 $border-radius-base $border-radius-base 0;
+            > tr.child {
             }
         }
     }
