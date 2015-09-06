@@ -111,31 +111,27 @@ $colreorder-insert-color: $brand-secondary;
 
             > tr:not(.child) {
                 // cursor
-                > td:not(.actions) {
+                > td:not(.actions):not(.dataTables_empty) {
                     cursor: pointer;
                 }
 
                 // hover, selected, and round borders
 
-                &:hover > td,
-                &.selected > td {
-                    border-top: 1px solid $brand-primary-light;    // solid is more specific than dotted
-                    border-bottom: 1px solid $brand-primary-light;
-
-                    background-color: $table-bg-selected;
-                    color: $brand-primary-light;
-                }
-
-                &:hover > td {
-                    background-color: $table-bg-hover;
-                }
-
                 &:hover,
-                &.selected,
-                &.selected:hover {
-                    td {
+                &.selected {
+                    > td:not(.dataTables_empty) {
+                        //border-top: 1px solid $brand-primary-light;    // solid is more specific than dotted
+                        border-top: 0 hidden;
+                        border-bottom: 1px solid $brand-primary-light;
                         @include round-corners();
+
+                        background-color: $table-bg-selected;
+                        color: $brand-primary-light;
                     }
+                }
+
+                &:hover > td:not(.dataTables_empty) {
+                    background-color: $table-bg-hover;
                 }
             }
 
