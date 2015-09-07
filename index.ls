@@ -383,8 +383,8 @@ export class Entity
 
         # scroll back into view - TODO: use DataTables row().show() plugin and this to it? needed for paging tables
         $tr[0].scrollIntoView!
-        if $tr.offset().top - $('body').scrollTop! < $(window).height() / 3
-            document.body.scrollTop -= $(window).height() / 3
+        if $tr.offset().top < $(window).scrollTop! + $(window).height() / 3
+            $(window).scrollTop( $(window).scrollTop! - $(window).height() / 3 )
 
         # in case of done(): Wait for all model changes to go through before going to the next page, mainly because
         # in non-single-page-app mode (basically IE < 10) we want changes to save to the server before leaving the page
