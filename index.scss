@@ -4,34 +4,41 @@
 // Then import the global defaults so that changes cascade
 @import 'bootstrap/variables';
 
+$fa-font-path: '/fonts/font-awesome';
+@import 'fontawesome/scss/font-awesome';
+
 @import 'datatables/dataTables.bootstrap.css';
 @import 'datatables/dataTables.fontAwesome.css';
 
-@import 'datatables/colReorder.dataTables';
-@import 'datatables/responsive.dataTables';
-
 @import 'compass/css3/border-radius';
-
-// Responsive
-$open-button-background: #337ab7;    // TODO
-$close-button-background: #d33333;
 
 // ColReorder
 $colreorder-insert-color: $brand-secondary;
+@import 'datatables/colReorder.dataTables';
 
-@mixin round-corners() {
+// Responsive
+$open-button-color: $brand-primary;
+$close-button-color: $brand-primary;
+@import 'datatables/responsive.dataTables';
+
+
+@mixin round-corners($radius) {
     &:first-child {
-        @include border-radius($border-radius-base 0 0 $border-radius-base);
+        @include border-radius($radius 0 0 $radius);
+        // @include border-radius(($radius+1px) 0 0 $radius);
     }
 
     &:last-child {
-        @include border-radius(0 $border-radius-base $border-radius-base 0);
+        @include border-radius(0 $radius $radius 0);
+        // @include border-radius(0 ($radius+1px) $radius 0);
     }
 }
 
 .entities {
     .animate-selection td {
-        transition-property: background-color, color;
+        @include round-corners($border-radius-base);
+
+        transition-property: all;
         transition-duration: .5s;
         transition-delay: .3s;
     }
@@ -55,7 +62,7 @@ $colreorder-insert-color: $brand-secondary;
     table.dataTable.table-condensed {
         > thead {
             > tr > th {
-                @include round-corners();
+                @include round-corners($border-radius-base);
                 border: 0;
                 background-color: $brand-primary;
 
@@ -85,19 +92,9 @@ $colreorder-insert-color: $brand-secondary;
         }
 
 
-        // responsive icons
-        &.dtr-column > tbody > tr > th.control,
-        &.dtr-column > tbody > tr > td.control {
-            width: 12px;
-
-            &:before {
-                left: inherit;
-                margin-left: -4px;
-            }
-        }
-
-
         > tbody {
+
+            // table borders
             > tr {
                 > td {
                     border-top: 1px dotted $brand-primary-light;        // TODO: try opacify() with solid/double
@@ -111,7 +108,7 @@ $colreorder-insert-color: $brand-secondary;
 
             > tr:not(.child) {
                 // cursor
-                > td:not(.actions):not(.dataTables_empty) {
+                > td:not(.actions):not(.dataTables_empty):not(.control) {
                     cursor: pointer;
                 }
 
@@ -120,12 +117,16 @@ $colreorder-insert-color: $brand-secondary;
                 &:hover,
                 &.selected {
                     > td:not(.dataTables_empty) {
-                        //border-top: 1px solid $brand-primary-light;    // solid is more specific than dotted
-                        border-top: 0 hidden;
-                        border-bottom: 1px solid $brand-primary-light;
-                        @include round-corners();
+                        @supports (-webkit-appearance:none) {
+                            border-top: 1px solid $brand-primary-light;    // solid is more specific than dotted
+                            border-bottom: 1px solid $brand-primary-light;
+                        }
+                        @supports (-moz-appearance:none) {
+                            border-top: hidden;
+                            border-bottom: hidden;
+                        }
+                        @include round-corners($border-radius-base);
 
-                        background-color: $table-bg-selected;
                         color: $brand-primary-light;
                     }
                 }
@@ -133,9 +134,23 @@ $colreorder-insert-color: $brand-secondary;
                 &:hover > td:not(.dataTables_empty) {
                     background-color: $table-bg-hover;
                 }
+
+                &.selected > td:not(.dataTables_empty) {
+                    background-color: $table-bg-selected;
+                }
             }
 
-            > tr.child {
+            // details rows
+            > tr.child > td.child {
+                border-top: hidden;
+                //background-color: $brand-primary-med-light;
+                padding: 0;
+
+                table {
+                    margin-left: 15px;
+                    border-collapse: separate;
+                    border-spacing: 10px;
+                }
             }
         }
     }
