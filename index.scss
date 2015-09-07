@@ -22,15 +22,13 @@ $close-button-color: $brand-primary;
 @import 'datatables/responsive.dataTables';
 
 
-@mixin round-corners($radius) {
+@mixin round-corners($radius, $adjust-top: 0px) {
     &:first-child {
-        @include border-radius($radius 0 0 $radius);
-        // @include border-radius(($radius+1px) 0 0 $radius);
+        @include border-radius(($radius + $adjust-top) 0 0 $radius);
     }
 
     &:last-child {
-        @include border-radius(0 $radius $radius 0);
-        // @include border-radius(0 ($radius+1px) $radius 0);
+        @include border-radius(0 ($radius + $adjust-top) $radius 0);
     }
 }
 
@@ -118,14 +116,15 @@ $close-button-color: $brand-primary;
                 &.selected {
                     > td:not(.dataTables_empty) {
                         @supports (-webkit-appearance:none) {
-                            border-top: 1px solid $brand-primary-light;    // solid is more specific than dotted
+                            border-top: 1px solid $brand-primary-light;        // solid is more specific than dotted
                             border-bottom: 1px solid $brand-primary-light;
+                            @include round-corners($border-radius-base, 1px);
                         }
                         @supports (-moz-appearance:none) {
                             border-top: hidden;
                             border-bottom: hidden;
+                            @include round-corners($border-radius-base);
                         }
-                        @include round-corners($border-radius-base);
 
                         color: $brand-primary-light;
                     }
