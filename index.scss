@@ -130,12 +130,12 @@ $close-button-color: $brand-primary;
                     }
                 }
 
-                &:hover > td:not(.dataTables_empty) {
-                    background-color: $table-bg-hover;
-                }
-
                 &.selected > td:not(.dataTables_empty) {
                     background-color: $table-bg-selected;
+                }
+
+                &:hover > td:not(.dataTables_empty) {
+                    background-color: $table-bg-hover;
                 }
             }
 
