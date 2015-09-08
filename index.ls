@@ -95,13 +95,14 @@ export class Entity
 
         #model.on "all", "**", -> console.log(arguments)
 
+        # data changes
         model.on "all", "_page.items.*.**", (rowindex, path, event) ~>
             # on "change" events, the path is:
             #   "" if a new item was added
             #   undefined if an item was deleted
             return if not path
 
-            # no need to modify table data, we have the data getter in columnDefs
+            # no need to modify table data, we have the data getter in columnDefs that gets the current data
             row = @dtApi.row(rowindex).invalidate!
             requestAnimationFrame !-> row.draw!
 
@@ -116,16 +117,21 @@ export class Entity
 
 
 
-        # insert and remove -- first the captures, then the rest
+        # insert and remove item(s) -- first the captures, then the rest
         # items is an array
         model.on "insert", "_page.items", (rowindex, items) ~>
             for item in items
                 row = @dtApi.row.add(item)
-                requestAnimationFrame !-> row.draw!
+            # do not use requestAnimationFrame here, otherwise select(), because it is synchronous, will be
+            #  called before the tr element is created, and it won't find it.
+            row.draw!
 
         model.on "remove", "_page.items", (rowindex, removed) ~>
-            row = @dtApi.row(rowindex).remove!
-            requestAnimationFrame !-> row.draw!
+            # TODO: fix Derby/Racer: removed is always empty :(
+            row = @dtApi.row(rowindex)
+            @entityMessage row.data!, 'messages.entityDeleted'
+            requestAnimationFrame !-> row.remove!.draw!
+
 
 
 
@@ -225,7 +231,7 @@ export class Entity
                         catch e
 
                         attr = @getAttribute("entity").attributes[col - 1]
-                        return "err" if not attr
+                        throw new Error("attribute #{col - 1} not found for #{entityId}!") if not attr
 
                         if type == 'display' and attr.type == 'color'
                             $(api.cell(meta.row, col).node()).css("background-color", data[attr.id])
@@ -360,6 +366,8 @@ export class Entity
         @deselect!
 
 
+    # Select the item with the given id. If no id is given, the current item (@item) will be selected.
+    # If the item is already selected, deselet it.
     select: (id) ->
         if not id
             id = @item.get().id
@@ -424,8 +432,6 @@ export class Entity
 
         # actually delete the item
         item = @items.del(id)
-
-        @entityMessage item, 'messages.entityDeleted'
 
 
     getItemName: (item) ->
