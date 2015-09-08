@@ -50,6 +50,32 @@ $close-button-color: $brand-primary;
         }
     }
 
+    .dataTables_wrapper {
+        .dt-control {
+            display: flex;
+            width: 100%;
+
+            //justify-content: space-between; // not needed due to margin-*: auto below
+            align-items: center;
+
+            label {
+                margin: 0;
+            }
+
+            .dataTables_length {
+                margin-right: auto;
+            }
+
+            .dataTables_filter {
+                margin-left: auto;
+            }
+        }
+
+        .dataTables_paginate {
+            float: left;
+        }
+    }
+
 
     table.dataTable span.highlight {
       //background-color: $brand-info;

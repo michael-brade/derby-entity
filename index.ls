@@ -77,15 +77,8 @@ export class Entity
         require('jquery.highlight')
         require('datatables.searchHighlight')
 
-        $.fn.dataTable.Api.register 'deselect()', ->
-            $tr = this.$('tr.selected').addClass('animate-selection')
-            requestAnimationFrame -> $tr.removeClass('selected')
-            setTimeout (-> $tr.removeClass('animate-selection')), 1000      # don't use transitionend because it can be prolonged with the mouse!
-            return $tr
 
-        $.fn.dataTable.Api.register 'select()', (itemId) ->
-            this.$('.animate-selection').removeClass('animate-selection')   # don't animate deselect if we just change the selection
-            this.$('tr#' + itemId).addClass('selected')
+        @registerDataTablesPlugins!
 
         # init the table
         @createTable!
@@ -104,7 +97,9 @@ export class Entity
 
             # no need to modify table data, we have the data getter in columnDefs that gets the current data
             row = @dtApi.row(rowindex).invalidate!
-            requestAnimationFrame !-> row.draw!
+            requestAnimationFrame !~>
+                row.draw false
+                row.show! if @item.get("id") == row.id! # only if it is selected do we want to see it
 
             #@dtApi.state.save()
 
@@ -124,13 +119,13 @@ export class Entity
                 row = @dtApi.row.add(item)
             # do not use requestAnimationFrame here, otherwise select(), because it is synchronous, will be
             #  called before the tr element is created, and it won't find it.
-            row.draw!
+            row.draw false
 
         model.on "remove", "_page.items", (rowindex, removed) ~>
             # TODO: fix Derby/Racer: removed is always empty :(
             row = @dtApi.row(rowindex)
             @entityMessage row.data!, 'messages.entityDeleted'
-            requestAnimationFrame !-> row.remove!.draw!
+            requestAnimationFrame !-> row.remove!.draw false    # false means: stay on current page
 
 
 
@@ -154,18 +149,70 @@ export class Entity
         $(document).off 'keydown'
 
 
+    registerDataTablesPlugins: !->
+        $.fn.dataTable.Api.register 'deselect()', ->
+            $tr = this.$('tr.selected').addClass('animate-selection')
+            requestAnimationFrame -> $tr.removeClass('selected')
+            setTimeout (-> $tr.removeClass('animate-selection')), 1000      # don't use transitionend because it can be prolonged with the mouse!
+            return $tr
 
-    createTable: ->
+
+        $.fn.dataTable.Api.register 'select()', (itemId) ->
+            this.$('.animate-selection').removeClass('animate-selection')   # don't animate deselect if we just change the selection
+            this.$('tr#' + itemId).addClass('selected')
+
+
+        $.fn.dataTable.Api.register 'row().show()', ->
+            page_info = @table().page.info!
+
+            # account for the "display" all case - row is already displayed
+            return @ if page_info.length == -1
+
+            row_position = @table().rows()[0].indexOf @index!
+
+            # already on right page
+            return @ if row_position >= page_info.start && row_position < page_info.end
+
+            # find page number and go there
+            page_to_display = Math.floor(row_position/page_info.length)
+            @table().page(page_to_display).draw('page')
+
+            @ # return row object
+
+
+
+    createTable: !->
         settings =
             language: @model.root.get("$lang.dict.strings." + @page.l(@model.get("$locale")) + ".dataTables")
             autowidth: true    # takes cpu, see also column.width
             #lenghthChange: false
 
-            dom: "Zft" # Z for ColResize
+            dom: "Z<'dt-control'lrf>tp" # Z for ColResize
             info: false
-            paging: false
+
+            paging: true
+            lengthMenu: [[10, 20, 30, 50, -1], [10, 20, 30, 50, "All"]]
+
+            fnDrawCallback: ->
+                wrapper = this.parent()
+                rowsPerPage = this.fnSettings()._iDisplayLength
+                rowsToShow = this.fnSettings().fnRecordsDisplay()
+                minRowsPerPage = this.fnSettings().aLengthMenu[0][0]
+
+                if rowsToShow <= rowsPerPage || rowsPerPage == -1
+                    $('.dataTables_paginate', wrapper).hide!
+                else
+                    $('.dataTables_paginate', wrapper).show!
+
+                if rowsToShow <= minRowsPerPage
+                    $('.dataTables_length', wrapper).hide!
+                else
+                    $('.dataTables_length', wrapper).show!
+
             searching: true
             searchHighlight: true
+
+            processing: true
 
             colReorder:
                 fixedColumnsLeft: 1
@@ -379,7 +426,8 @@ export class Entity
             @item.ref(@items.at(id))
             @app.history.push(@app.pathFor(@getAttribute("entity").id, id), false)
 
-        @dtApi.select(id)
+        $tr = @dtApi.select(id)
+        @dtApi.row($tr).show!
         $(@form).find(':input[type!=hidden]').first().focus()
         @startValidation!
 
@@ -388,8 +436,9 @@ export class Entity
         return if not @item.get!
 
         $tr = @dtApi.deselect!
+        @dtApi.row($tr).show!
 
-        # scroll back into view - TODO: use DataTables row().show() plugin and this to it? needed for paging tables
+        # scroll back into view
         $tr[0].scrollIntoView!
         if $tr.offset().top < $(window).scrollTop! + $(window).height() / 3
             $(window).scrollTop( $(window).scrollTop! - $(window).height() / 3 )
