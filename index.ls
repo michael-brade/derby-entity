@@ -191,7 +191,8 @@ export class Entity
             info: false
 
             paging: true
-            lengthMenu: [[10, 20, 30, 50, -1], [10, 20, 30, 50, "All"]]
+            lengthMenu: [[10, 20, 30, 50, -1], [10, 20, 30, 50, @page.t(@model.get("$locale"), 'dataTables.oPaginate.sAll')]]
+            pageLength: -1
 
             fnDrawCallback: ->
                 wrapper = this.parent()
