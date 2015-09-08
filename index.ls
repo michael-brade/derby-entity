@@ -7,15 +7,14 @@ require! {
 # the attibutes of a selected entity on the right.
 #
 # view parameters:
-#  * item     - either a new item (empty Object), no item (null), or points to the currently selected item
-#  * entity   - the entity definition object
+#  * item     - if not null/undefined then it points to the currently selected item
+#  * entity   - the entity definition object of the current entity to be displayed and edited
 #  * entities - all entity definitions
 #
 #
 # Parameters are accessible by
-#   @getAttribute("entity")
-# or
-#   @model.get("entity")
+#   @getAttribute("entity") or @model.get("entity")
+# In the view just "entity" is enough to access them.
 export class Entity
 
     view: __dirname
@@ -24,21 +23,23 @@ export class Entity
     components: [require('../modal')]
 
     # if declared here (part of the prototype), these are not private and visible in the view!
+    entity: null
     repository: null
 
     # called on the server and the client before rendering
     init: (model) !->
         model.ref('$locale', model.root.at('$locale'))
 
-        @item = model.ref('_page.item', 'item')             # the item being added or edited - parameter, thus not _page!
+        @entity = @getAttribute("entity")
+        @item = model.ref('_page.item', 'item')         # the item being added or edited - parameter, thus not _page!
+        @items = model.root.at(@entity.id)              # the list of entity instances to be displayed
 
-        @items = model.root.at(@getAttribute("entity").id)  # the list of entity instances to be displayed
-        model.ref '_page.items', @items.filter(null)        # make items available in the local model as a list with a null-filter
+        model.ref '_page.items', @items.filter(null)    # make items available in the local model as a list with a null-filter
 
         @repository = new Entities(model, model.get('entities'))
 
         # make all dependent entity items available as lists under "_page.<entity id>"
-        @getAttribute("entity").attributes.forEach (attr) ->
+        @entity.attributes.forEach (attr) ->
             if (attr.type == 'entity')
                 model.ref '_page.' + attr.entity, model.root.filter(attr.entity, null)
 
@@ -63,7 +64,7 @@ export class Entity
      *  this.app.model is global model
      */
     create: (model, dom) ->
-        # console.log("Entity.create: ", @getAttribute("entity").id)
+        # console.log("Entity.create: ", @entity.id)
 
         #dom.on 'keydown', (e) ~>   # this registers several dom listeners
 
@@ -144,7 +145,7 @@ export class Entity
      */
     destroy: (model, dom) ->
         # TODO: Bug: dom is always null!
-        # console.log("Entity.destroy: ", @getAttribute("entity").id, dom)
+        # console.log("Entity.destroy: ", @entity.id, dom)
 
         $(document).off 'keydown'
 
@@ -252,7 +253,7 @@ export class Entity
 
                         return if data then $('<table/>').append(data) else false
 
-            data: @repository.getItems @getAttribute("entity").id
+            data: @repository.getItems @entity.id
             rowId: 'id'
 
             order: [[ 1, "asc" ]]
@@ -276,13 +277,13 @@ export class Entity
                         col = meta.col
                         try col = api.colReorder.order()[meta.col]
 
-                        attr = @getAttribute("entity").attributes[col - 1]
+                        attr = @entity.attributes[col - 1]
                         throw new Error("attribute #{col - 1} not found for #{entityId}!") if not attr
 
                         if type == 'display' and attr.type == 'color'
                             $(api.cell(meta.row, col).node()).css("background-color", data[attr.id])
 
-                        return @repository.getItemAttr data, attr.id, @getAttribute("entity").id, @page.l(@model.get("$locale"))
+                        return @repository.getItemAttr data, attr.id, @entity.id, @page.l(@model.get("$locale"))
 
                 *   targets: "actions"
                     className: "actions"
@@ -364,7 +365,7 @@ export class Entity
         )
 
         $tbody.on 'click', '> tr > td.actions .action-references', (e) ~>
-            @repository.fetchAllReferencingEntities @getAttribute("entity").id, (err) ->
+            @repository.fetchAllReferencingEntities @entity.id, (err) ->
                 # fix to center the popover over the icon; currentTarget is never the span
                 e.currentTarget = e.target
 
@@ -401,7 +402,7 @@ export class Entity
     add: !->
         id = @items.add {}
         @select id
-        #@emit("added" + @getAttribute("entity").id, newItem)
+        #@emit("added" + @entity.id, newItem)
 
 
     /* When called as "done(this)" from the view, "this", the argument, will be the object with the current model data,
@@ -423,7 +424,7 @@ export class Entity
         else
             # otherwise @item points to the selected item and the first input is focused
             @item.ref(@items.at(id))
-            @app.history.push(@app.pathFor(@getAttribute("entity").id, id), false)
+            @app.history.push(@app.pathFor(@entity.id, id), false)
 
         $tr = @dtApi.select(id)
         @dtApi.row($tr).show!
@@ -457,9 +458,9 @@ export class Entity
         # in non-single-page-app mode (basically IE < 10) we want changes to save to the server before leaving the page
         @model.whenNothingPending ~>
             if push
-                @app.history.push(@app.pathFor(@getAttribute("entity").id), false)
+                @app.history.push(@app.pathFor(@entity.id), false)
             else
-                @app.history.replace(@app.pathFor(@getAttribute("entity").id), false)
+                @app.history.replace(@app.pathFor(@entity.id), false)
 
 
     showDeleteModal: (item) ->
@@ -474,7 +475,7 @@ export class Entity
 
     remove: (id) ->
         # check if the item to be deleted is still referenced
-        if @repository.itemReferences id, @getAttribute("entity").id
+        if @repository.itemReferences id, @entity.id
             usages = "<ul>"
             loc = @model.get("$locale")
             for usage in that
@@ -482,7 +483,7 @@ export class Entity
 
             usages += "</ul>"
 
-            @model.toast('error', @page.t(loc, 'messages.itemReferenced', { 'ENTITY': @page.t(loc, @getAttribute("entity").id + '.one') }) + usages)
+            @model.toast('error', @page.t(loc, 'messages.itemReferenced', { 'ENTITY': @page.t(loc, @entity.id + '.one') }) + usages)
             return
 
         # if id is already selected, deselect
@@ -494,14 +495,14 @@ export class Entity
 
 
     getItemName: (item) ->
-        @repository.getItemAttr item, 'name', @getAttribute("entity").id, @page.l(@model.get("$locale"))
+        @repository.getItemAttr item, 'name', @entity.id, @page.l(@model.get("$locale"))
 
 
     entityMessage: (item, message) ->
         loc = @model.get("$locale")
 
         @model.toast('success', @page.t(loc, message, {
-            'ENTITY': @page.t(loc, @getAttribute("entity").id + '.one')
+            'ENTITY': @page.t(loc, @entity.id + '.one')
             'ITEM': @getItemName item
         }))
 
@@ -509,21 +510,21 @@ export class Entity
         # there should be one output root path (containing an object with field IDs) and always a fn "validate()"
         # input path is to the entity object (item? or item id?)
 
-        # @repository.forEachAttr @getAttribute("entity").attributes, (attrId) ~>
+        # @repository.forEachAttr @entity.attributes, (attrId) ~>
         #     path = "$validation.form." + attrId
-        #     fn = @repository.getValidator attr, @getAttribute("entity").id, loc
+        #     fn = @repository.getValidator attr, @entity.id, loc
         #     @model.start(path, "_page.item." + attrId, fn)
 
 
-        @getAttribute("entity").attributes.forEach (attr) ~>
+        @entity.attributes.forEach (attr) ~>
             if attr.i18n
                 for loc in @model.get("$locale.supported")
                     path = "$validation.form." + attr.id + "_" + loc
-                    if fn = @repository.getValidator attr, @getAttribute("entity").id, loc  # TODO: performance: don't call @getAttribute each iteration?!
+                    if fn = @repository.getValidator attr, @entity.id, loc
                         @model.start(path, "_page.item.id", "_page.item." + attr.id + "." + loc, fn)
             else
                 path = "$validation.form." + attr.id
-                if fn = @repository.getValidator attr, @getAttribute("entity").id
+                if fn = @repository.getValidator attr, @entity.id
                     @model.start(path, "_page.item.id", "_page.item." + attr.id, fn)
 
     stopValidation: ->
