@@ -341,7 +341,7 @@ export class Entity
         switch e.keyCode
         | 13 =>
             # no form shown yet -> start new item
-            if !@item.get()
+            if not @item.get!
                 e.preventDefault!
                 @add!
 
@@ -385,14 +385,25 @@ export class Entity
 
 
     deselect: (push = true) ->
+        return if not @item.get!
+
         $tr = @dtApi.deselect!
-        @stopValidation!
-        @item.removeRef!
 
         # scroll back into view - TODO: use DataTables row().show() plugin and this to it? needed for paging tables
         $tr[0].scrollIntoView!
         if $tr.offset().top < $(window).scrollTop! + $(window).height() / 3
             $(window).scrollTop( $(window).scrollTop! - $(window).height() / 3 )
+
+        @stopValidation!
+        @item.removeRef!
+
+        # pressing Esc to deselect after changing the item causes a strange effect in Chrome:
+        #  "if _page.item" of the view is now false, so the input fields get removed with ConditionalBlock.update(),
+        # which calls replaceRange. And in replaceRange parent.removeChild(node) is called to remove the form.
+        # That causes Chrome to emit #document.change, calling documentChange and creating the item again.
+        # (registered by doc.addEventListener('change', documentChange, true) in derby/lib/documentListeners.js)
+        # Calling removeRef! a second time fixes this.
+        @item.removeRef!
 
         # in case of done(): Wait for all model changes to go through before going to the next page, mainly because
         # in non-single-page-app mode (basically IE < 10) we want changes to save to the server before leaving the page
