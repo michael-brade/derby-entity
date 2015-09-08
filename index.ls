@@ -223,11 +223,11 @@ export class Entity
 
             stateSave: true
             stateDuration: 0
-            fnStateSaveCallback: (settings, data) !->
-                try localStorage.setItem 'EditorTables_' + settings.sInstance, JSON.stringify(data)
+            fnStateSaveCallback: (settings, data) !~>
+                try localStorage.setItem @app.name + "_entities_" + settings.sInstance, JSON.stringify(data)
 
-            fnStateLoadCallback: (settings) ->
-                try JSON.parse(localStorage.getItem 'EditorTables_' + settings.sInstance)
+            fnStateLoadCallback: (settings) ~>
+                try JSON.parse(localStorage.getItem @app.name + "_entities_" + settings.sInstance)
 
 
             renderer: "bootstrap"
@@ -273,10 +273,8 @@ export class Entity
                             return
 
                         api = meta.settings.oInstance.api(true)
-                        col = meta.col #api.colReorder.order()[meta.col]
-                        try
-                            col = api.colReorder.order()[meta.col]
-                        catch e
+                        col = meta.col
+                        try col = api.colReorder.order()[meta.col]
 
                         attr = @getAttribute("entity").attributes[col - 1]
                         throw new Error("attribute #{col - 1} not found for #{entityId}!") if not attr
