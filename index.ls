@@ -17,6 +17,7 @@ require! {
 # In the view just "entity" is enough to access them.
 export class Entity
 
+    name: 'entity'
     view: __dirname
     style: __dirname
 
