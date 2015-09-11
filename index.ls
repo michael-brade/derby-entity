@@ -21,7 +21,7 @@ export class Entity
     view: __dirname
     style: __dirname
 
-    components: [require('../modal')]
+    components: [require('modal'), require('derby-entity-select2')]
 
     # if declared here (part of the prototype), these are not private and visible in the view!
     entity: null
