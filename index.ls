@@ -1,6 +1,6 @@
 require! {
     'lodash': _
-    '../../lib/entity/entity': { Entities }
+    'lib/racer-entities/entity': { Entities }
 }
 
 # Display one entity with a table listing all instances on the left and
@@ -21,7 +21,7 @@ export class Entity
     view: __dirname
     style: __dirname
 
-    components: [require('modal'), require('derby-entity-select2')]
+    components: [require('d-comp-palette/modal/modal'), require('derby-entity-select2')]
 
     # if declared here (part of the prototype), these are not private and visible in the view!
     entity: null
