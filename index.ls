@@ -37,7 +37,7 @@ export class Entity
 
         model.ref '_page.items', @items.filter(null)    # make items available in the local model as a list with a null-filter
 
-        @repository = new Entities(model, model.get('entities'))
+        @repository = new Entities(@app, model, model.get('entities'))
 
         # make all dependent entity items available as lists under "_page.<entity id>"
         @entity.attributes.forEach (attr) ->
@@ -281,10 +281,12 @@ export class Entity
                         attr = @entity.attributes[col - 1]
                         throw new Error("attribute #{col - 1} not found for #{entityId}!") if not attr
 
-                        if type == 'display' and attr.type == 'color'
-                            $(api.cell(meta.row, col).node()).css("background-color", data[attr.id])
-
-                        return @repository.getItemAttr data, attr.id, @entity.id, @page.l(@model.get("$locale"))
+                        @repository.render(
+                            data[attr.id],
+                            attr,
+                            @page.l(@model.get("$locale")),
+                            if type == 'display' then api.cell(meta.row, col).node() else undefined /* == parent node */
+                        )
 
                 *   targets: "actions"
                     className: "actions"
@@ -347,7 +349,7 @@ export class Entity
             html: true
             title: ->
                 item = entity.dtApi.row( $(this).parents('tr') ).data!
-                name = entity.getItemName item
+                name = entity.renderItemName item
                 entity.page.t(entity.model.get("$locale"), 'dialogs.referencePopoverTitle', { ITEM: name })
 
             content: ->
@@ -397,7 +399,22 @@ export class Entity
 
 
 
-    # The following functions can be called from the view
+    # The following functions are meant to be called from the view
+
+    ## Given an item, render its attribute and return the html
+    #
+    renderAttribute: (item, attr) ->
+        return "" if not item
+        @repository.render(
+            item[attr.id],
+            attr,
+            @page.l(@model.get("$locale")))
+
+
+    renderItemName: (item) ->
+        nameAttr = @repository.getEntity(@entity.id).attributes['name']
+        @renderAttribute item, nameAttr
+
 
     /** Create a new item. */
     add: !->
@@ -495,16 +512,12 @@ export class Entity
         item = @items.del(id)
 
 
-    getItemName: (item) ->
-        @repository.getItemAttr item, 'name', @entity.id, @page.l(@model.get("$locale"))
-
-
     entityMessage: (item, message) ->
         loc = @model.get("$locale")
 
         @model.toast('success', @page.t(loc, message, {
             'ENTITY': @page.t(loc, @entity.id + '.one')
-            'ITEM': @getItemName item
+            'ITEM': @renderItemName item
         }))
 
     startValidation: ->

@@ -72,7 +72,7 @@
 
         {{t($locale, 'messages.deleteEntity', { 'ENTITY': t($locale, entity.id + '.one') })}}
         <p class="text-center">
-            <strong>{{repository.getItemAttr(_page.itemToBeDeleted, "name", entity.id, l($locale))}}</strong>
+            <strong>{{renderItemName(_page.itemToBeDeleted)}}</strong>
         </p>
 
         <action name='delete' class="btn-primary" autofocus default>{{t($locale, 'actions.delete')}}</action>
@@ -89,11 +89,7 @@
                 {{@label}}
             </label>
             <div class="col-md-10">
-                {{if @content}}
                     {{@content}}
-                {{else}}
-                    <input id="{{@id}}" class="form-control" type="{{@type}}" value="{{@value}}">
-                {{/if}}
             </div>
         </div>
     {{/}}
