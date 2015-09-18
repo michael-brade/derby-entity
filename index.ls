@@ -1,5 +1,5 @@
 require! {
-    'lodash': _
+    lodash: _
     'lib/racer-entities/entity': { Entities }
 }
 
@@ -23,7 +23,7 @@ export class Entity
 
     components: [require('d-comp-palette/modal/modal'), require('derby-entity-select2')]
 
-    # if declared here (part of the prototype), these are not private and visible in the view!
+    # if declared with : (part of the prototype), these are not private and visible in the view!
     entity: null
     repository: null
 
@@ -70,6 +70,10 @@ export class Entity
         #dom.on 'keydown', (e) ~>   # this registers several dom listeners
 
         $(document).keydown (e) ~> @keyActions.call(@, e)
+
+        @on 'destroy', ~>
+            $(document).off 'keydown'
+
 
         require('datatables')
         require('datatables.bootstrap')
@@ -132,23 +136,13 @@ export class Entity
 
 
 
-        # if app.history.push() is called with render, destroy() and create() are called, but the old listener is never removed!
+        # if app.history.push() is called with render == true, destroy() and create() are called,
+        # but the old listener is never removed!
 
         if @item.get!
             @select!
 
 
-    /* Called when leaving the "page" with the Entity component.
-     *
-     *   - release memory
-     *   - stop reactive functions
-     *   - remove client libraries
-     */
-    destroy: (model, dom) ->
-        # TODO: Bug: dom is always null!
-        # console.log("Entity.destroy: ", @entity.id, dom)
-
-        $(document).off 'keydown'
 
 
     registerDataTablesPlugins: !->
