@@ -333,9 +333,9 @@ export class Entity
         $tbody.popover(
             placement: 'top'
             selector: 'span.action-references i'
-            container: '#' + entity.getAttribute("entity").id
+            container: '#' + entity.entity.id
             viewport:
-                selector: '#' + entity.getAttribute("entity").id
+                selector: '#' + entity.entity.id
                 padding: 0
 
             trigger: 'manual'
@@ -350,14 +350,14 @@ export class Entity
                 id = entity.dtApi.row( $(this).parents('tr') ).id!
                 loc = entity.model.get("$locale")
 
-                if entity.repository.itemReferences id, entity.getAttribute("entity").id
+                if entity.repository.itemReferences id, entity.entity.id
                     referencees = "<ul>"
                     for usage in that
                         referencees += "<li>" + entity.page.t(loc, usage.entity + '.one') + ": " + usage.item + "</li>"
                     return referencees + "</ul>"
 
                 entity.page.t(loc, 'dialogs.referencePopoverUnused', {
-                    ENTITY: entity.page.t(loc, entity.getAttribute("entity").id + '.one')
+                    ENTITY: entity.page.t(loc, entity.entity.id + '.one')
                 })
         )
 
