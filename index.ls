@@ -1,6 +1,6 @@
 require! {
     lodash: _
-    'derby-entities-lib/entity': EntitiesApi
+    'derby-entities-lib/api': EntitiesApi
 }
 
 # Display one entity with a table listing all instances and
