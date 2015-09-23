@@ -26,6 +26,7 @@ export class Entity
         require('derby-entity-select2')
 
         require('derby-entities-lib/types/text')
+        require('derby-entities-lib/types/number')
         require('derby-entities-lib/types/entity')
         require('derby-entities-lib/types/color')
         #require('derby-entities-lib/types/image')
@@ -282,7 +283,7 @@ export class Entity
                         throw new Error("attribute #{col - 1} not found for #{entityId}!") if not attr
 
                         @entitiesApi.renderAttribute(
-                            data[attr.id],
+                            data,
                             attr,
                             @page.l(@model.get("$locale")),
                             if type == 'display' then api.cell(meta.row, col).node() else undefined /* == parent node */
@@ -405,7 +406,7 @@ export class Entity
     renderAttribute: (item, attr) ->
         return "" if not item
         @entitiesApi.renderAttribute(
-            item[attr.id],
+            item,
             attr,
             @page.l(@model.get("$locale")))
 

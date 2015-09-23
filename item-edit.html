@@ -9,17 +9,17 @@
         {{each entity.attributes as #field}}
             {{if #field.i18n}}
                 {{each $locale.supported as #loc}}
-                    <fieldgroup id="{{#field.id}}_{{#loc}}" label="{{t($locale, entity.id + '.' + #field.id)}} ({{#loc}})">
-                        <view name="{{#field.type}}" item="_page.item" attr="{{#field}}" loc="{{#loc}}" />
+                    <fieldgroup id="{{#field.id}}_{{#loc}}" label="{{t($locale, entity.id + '.' + #field.id)}} ({{#loc}})" within>
+                        <view name="{{#field.type}}" mode="edit" item="{{_page.item}}" attr="{{#field}}" loc="{{#loc}}" inherit />
                     </fieldgroup>
                 {{/}}
             {{else}}
-                <fieldgroup id="{{#field.id}}" label="{{t($locale, entity.id + '.' + #field.id)}}">
-                    <view name="{{#field.type}}" attr="{{#field}}" value="{{_page.item[#field.id]}}" />
+                <!-- this is called twice upon changing the input! WHY?? -->
+                <!-- {{console.log("render field: ", #field, _page.item[#field.id])}} -->
+                <fieldgroup id="{{#field.id}}" label="{{t($locale, entity.id + '.' + #field.id)}}" within>
+                    <view name="{{#field.type}}" mode="edit" item="{{_page.item}}" attr="{{#field}}" inherit/>
                 </fieldgroup>
             {{/}}
-
-            <!-- TODO OR: view name="{{types.viewName(#field.type)}}" /-->
         {{/each}}
 
         <div class="row">
@@ -36,7 +36,7 @@
 <fieldgroup: element="fieldgroup">
     {{with @id as #id}} <!-- BUG in Derby parsing: "if !$validation.form[@id]" doesn't work! -->
         <div class="form-group {{if $validation.form[#id] === false}}has-error{{/}}">
-            <label for="{{@id}}" class="col-sm-2 control-label">
+            <label for="{{#id}}" class="col-sm-2 control-label">
                 {{@label}}
             </label>
             <div class="col-md-10">
