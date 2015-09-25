@@ -23,7 +23,6 @@ export class Entity
 
     components:
         require('d-comp-palette/modal/modal')
-        require('derby-entity-select2')
 
         require('derby-entities-lib/types/text')
         require('derby-entities-lib/types/number')
@@ -336,35 +335,38 @@ export class Entity
             @showDeleteModal @dtApi.row( $(e.target).parents('tr') ).data!
 
         # references
-        entity = this
+        _this = this
         $tbody.popover(
             placement: 'top'
             selector: 'span.action-references i'
-            container: '#' + entity.entity.id
+            container: '#' + _this.entity.id
             viewport:
-                selector: '#' + entity.entity.id
+                selector: '#' + _this.entity.id
                 padding: 0
 
             trigger: 'manual'
 
             html: true
             title: ->
-                item = entity.dtApi.row( $(this).parents('tr') ).data!
-                name = entity.renderItemName item
-                entity.page.t(entity.model.get("$locale"), 'dialogs.referencePopoverTitle', { ITEM: name })
+                item = _this.dtApi.row( $(this).parents('tr') ).data!
+                name = _this.renderItemName item
+                _this.page.t(_this.model.get("$locale"), 'dialogs.referencePopoverTitle', { ITEM: name })
 
             content: ->
-                id = entity.dtApi.row( $(this).parents('tr') ).id!
-                loc = entity.model.get("$locale")
+                itemId = _this.dtApi.row( $(this).parents('tr') ).id!
+                loc = _this.model.get("$locale")
 
-                if entity.entitiesApi.itemReferences id, entity.entity.id
-                    referencees = "<ul>"
-                    for usage in that
-                        referencees += "<li>" + entity.page.t(loc, usage.entity + '.one') + ": " + usage.item + "</li>"
-                    return referencees + "</ul>"
+                if _this.entitiesApi.itemReferences itemId, _this.entity.id
+                    references = "<ul>"
+                    for ref in that
+                        references += "<li>" +
+                            _this.page.t(loc, ref.entity.id + '.one') + ": " +
+                            _this.entitiesApi.renderAttribute(ref.item, ref.entity.attributes.name, _this.page.l loc) +
+                        "</li>"
+                    return references + "</ul>"
 
-                entity.page.t(loc, 'dialogs.referencePopoverUnused', {
-                    ENTITY: entity.page.t(loc, entity.entity.id + '.one')
+                _this.page.t(loc, 'dialogs.referencePopoverUnused', {
+                    ENTITY: _this.page.t(loc, _this.entity.id + '.one')
                 })
         )
 
@@ -494,15 +496,18 @@ export class Entity
 
     remove: (id) ->
         # check if the item to be deleted is still referenced
-        if @entitiesApi.itemReferences id, @entity.id
-            usages = "<ul>"
+        if @entitiesApi.itemReferences id, @entity.id           # TODO: this needs to fetchAllReferencingEntities!
+            references = "<ul>"
             loc = @model.get("$locale")
-            for usage in that
-                usages += "<li>" + @page.t(loc, usage.entity + '.one') + ": " + usage.item + "</li>"
 
-            usages += "</ul>"
+            for ref in that
+                references += "<li>" +
+                    @page.t(loc, ref.entity.id + '.one') + ": " +
+                    @entitiesApi.renderAttribute(ref.item, ref.entity.attributes.name, @page.l loc) +
+                "</li>"
+            references += "</ul>"
 
-            @model.toast('error', @page.t(loc, 'messages.itemReferenced', { 'ENTITY': @page.t(loc, @entity.id + '.one') }) + usages)
+            @model.toast('error', @page.t(loc, 'messages.itemReferenced', { 'ENTITY': @page.t(loc, @entity.id + '.one') }) + references)
             return
 
         # if id is already selected, deselect
