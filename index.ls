@@ -28,7 +28,7 @@ export class Entity
         require('derby-entities-lib/types/number')
         require('derby-entities-lib/types/entity')
         require('derby-entities-lib/types/color')
-        #require('derby-entities-lib/types/image')
+        require('derby-entities-lib/types/image')
 
     entity: null
     entitiesApi: null
