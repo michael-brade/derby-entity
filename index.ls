@@ -74,14 +74,6 @@ export class Entity
     create: (model, dom) ->
         #console.warn "Entity CREATE", @getAttribute("entity").id
 
-        #dom.on 'keydown', (e) ~>   # this registers several dom listeners
-
-        $(document).keydown (e) ~> @keyActions.call(@, e)
-
-        @on 'destroy', ~>
-            $(document).off 'keydown'
-
-
         require('datatables')
         require('datatables.bootstrap')
         require('datatables.responsive')
@@ -95,6 +87,15 @@ export class Entity
 
         # init the table
         @createTable!
+
+        #dom.on 'keydown', (e) ~>   # this registers several dom listeners
+
+        $(document).keydown (e) ~> @keyActions.call(@, e)
+
+        @on 'destroy', ~>
+            @dtApi.destroy true
+            $(document).off 'keydown'
+
 
 
         # EVENT REGISTRATION
