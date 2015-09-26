@@ -495,27 +495,28 @@ export class Entity
         closeCallback!
 
     remove: (id) ->
-        # check if the item to be deleted is still referenced
-        if @entitiesApi.itemReferences id, @entity.id           # TODO: this needs to fetchAllReferencingEntities!
-            references = "<ul>"
-            loc = @model.get("$locale")
+        @entitiesApi.fetchAllReferencingEntities @entity.id, (err) ~>
+            # check if the item to be deleted is still referenced
+            if @entitiesApi.itemReferences id, @entity.id
+                references = "<ul>"
+                loc = @model.get("$locale")
 
-            for ref in that
-                references += "<li>" +
-                    @page.t(loc, ref.entity.id + '.one') + ": " +
-                    @entitiesApi.renderAttribute(ref.item, ref.entity.attributes.name, @page.l loc) +
-                "</li>"
-            references += "</ul>"
+                for ref in that
+                    references += "<li>" +
+                        @page.t(loc, ref.entity.id + '.one') + ": " +
+                        @entitiesApi.renderAttribute(ref.item, ref.entity.attributes.name, @page.l loc) +
+                    "</li>"
+                references += "</ul>"
 
-            @model.toast('error', @page.t(loc, 'messages.itemReferenced', { 'ENTITY': @page.t(loc, @entity.id + '.one') }) + references)
-            return
+                @model.toast('error', @page.t(loc, 'messages.itemReferenced', { 'ENTITY': @page.t(loc, @entity.id + '.one') }) + references)
+                return
 
-        # if id is already selected, deselect
-        if @item.get("id") == id
-            @deselect false
+            # if id is already selected, deselect
+            if @item.get("id") == id
+                @deselect false
 
-        # actually delete the item
-        @items.del(id)
+            # actually delete the item
+            @items.del(id)
 
 
     entityMessage: (item, message) ->
