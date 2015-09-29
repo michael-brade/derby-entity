@@ -25,6 +25,7 @@ export class Entity
         require('d-comp-palette/modal/modal')
 
         require('derby-entities-lib/types/text')
+        require('derby-entities-lib/types/textarea')
         require('derby-entities-lib/types/number')
         require('derby-entities-lib/types/entity')
         require('derby-entities-lib/types/color')
