@@ -32,150 +32,164 @@ $close-button-color: $brand-primary;
     }
 }
 
-.entities {
-    .animate-selection td {
-        @include round-corners($border-radius-base);
 
-        transition-property: all;
-        transition-duration: .5s;
-        transition-delay: .3s;
+.animate-selection td {
+    @include round-corners($border-radius-base);
+
+    transition-property: all;
+    transition-duration: .5s;
+    transition-delay: .3s;
+}
+
+.popover {
+    max-width: none;
+    white-space: nowrap;
+
+    ul {
+        padding-left: 16px;
     }
+}
 
-    .popover {
-        max-width: none;
-        white-space: nowrap;
+// TODO: where to put the following three?
+.img-preview {
+    max-height: 100px;
+}
 
-        ul {
-            padding-left: 16px;
+.thumbnail {
+    display: inline-block;
+    margin-bottom: 0;
+
+}
+.caption {
+    padding: 5px;
+    text-align: center;
+}
+
+.dataTables_wrapper {
+    .dt-control {
+        display: flex;
+        width: 100%;
+
+        //justify-content: space-between; // not needed due to margin-*: auto below
+        align-items: center;
+
+        label {
+            margin: 0;
+        }
+
+        .dataTables_length {
+            margin-right: auto;
+        }
+
+        .dataTables_filter {
+            margin-left: auto;
         }
     }
 
-    .dataTables_wrapper {
-        .dt-control {
-            display: flex;
-            width: 100%;
+    .dataTables_paginate {
+        float: left;
+    }
+}
 
-            //justify-content: space-between; // not needed due to margin-*: auto below
-            align-items: center;
 
-            label {
-                margin: 0;
+table.dataTable span.highlight {
+  //background-color: $brand-info;
+  background-color: $brand-aux-1-med-light;
+}
+
+
+table.dataTable.table-condensed {
+    > thead {
+        > tr > th {
+            @include round-corners($border-radius-base);
+            border: 0;
+            background-color: $brand-primary;
+
+            // sort icons
+            padding-right: 5px;
+
+            &.sorting:after,
+            &.sorting_asc:after,
+            &.sorting_desc:after,
+            &.sorting_asc_disabled:after,
+            &.sorting_desc_disabled:after {
+                display: inline;
+                position: static;
+                padding-left: 5px;
             }
 
-            .dataTables_length {
-                margin-right: auto;
+            &.sorting:after {
+                opacity: 0.5;
+                color: $brand-primary-light;
             }
-
-            .dataTables_filter {
-                margin-left: auto;
-            }
-        }
-
-        .dataTables_paginate {
-            float: left;
         }
     }
 
-
-    table.dataTable span.highlight {
-      //background-color: $brand-info;
-      background-color: $brand-aux-1-med-light;
+    // sort columns
+    > tbody > tr > td.sorting_1 {
+        background-color: #fcf8e3;    // TODO: use variable, darken $brand-primary-light?
     }
 
 
-    table.dataTable.table-condensed {
-        > thead {
-            > tr > th {
-                @include round-corners($border-radius-base);
-                border: 0;
-                background-color: $brand-primary;
+    > tbody {
 
-                // sort icons
-                padding-right: 5px;
+        // table borders
+        > tr {
+            > td {
+                border-top: 1px dotted $brand-primary-light;        // TODO: try opacify() with solid/double
+                border-bottom: 1px dotted $brand-primary;
+            }
 
-                &.sorting:after,
-                &.sorting_asc:after,
-                &.sorting_desc:after,
-                &.sorting_asc_disabled:after,
-                &.sorting_desc_disabled:after {
-                    display: inline;
-                    position: static;
-                    padding-left: 5px;
-                }
+            &:last-child > td {
+                border-bottom-style: solid;
+            }
+        }
 
-                &.sorting:after {
-                    opacity: 0.5;
+        > tr:not(.child) {
+            // cursor
+            > td:not(.actions):not(.dataTables_empty):not(.control) {
+                cursor: pointer;
+            }
+
+            // hover, selected, and round borders
+
+            &:hover,
+            &.selected {
+                > td:not(.dataTables_empty) {
+                    @supports (-webkit-appearance:none) {
+                        border-top: 1px solid $brand-primary-light;        // solid is more specific than dotted
+                        border-bottom: 1px solid $brand-primary-light;
+                        @include round-corners($border-radius-base, 1px);
+                    }
+                    @supports (-moz-appearance:none) {
+                        border-top: hidden;
+                        border-bottom: hidden;
+                        @include round-corners($border-radius-base);
+                    }
+
                     color: $brand-primary-light;
                 }
             }
-        }
 
-        // sort columns
-        > tbody > tr > td.sorting_1 {
-            background-color: #fcf8e3;    // TODO: use variable, darken $brand-primary-light?
-        }
-
-
-        > tbody {
-
-            // table borders
-            > tr {
-                > td {
-                    border-top: 1px dotted $brand-primary-light;        // TODO: try opacify() with solid/double
-                    border-bottom: 1px dotted $brand-primary;
-                }
-
-                &:last-child > td {
-                    border-bottom-style: solid;
-                }
+            &.selected > td:not(.dataTables_empty) {
+                background-color: $table-bg-selected;
             }
 
-            > tr:not(.child) {
-                // cursor
-                > td:not(.actions):not(.dataTables_empty):not(.control) {
-                    cursor: pointer;
-                }
-
-                // hover, selected, and round borders
-
-                &:hover,
-                &.selected {
-                    > td:not(.dataTables_empty) {
-                        @supports (-webkit-appearance:none) {
-                            border-top: 1px solid $brand-primary-light;        // solid is more specific than dotted
-                            border-bottom: 1px solid $brand-primary-light;
-                            @include round-corners($border-radius-base, 1px);
-                        }
-                        @supports (-moz-appearance:none) {
-                            border-top: hidden;
-                            border-bottom: hidden;
-                            @include round-corners($border-radius-base);
-                        }
-
-                        color: $brand-primary-light;
-                    }
-                }
-
-                &.selected > td:not(.dataTables_empty) {
-                    background-color: $table-bg-selected;
-                }
-
-                &:hover > td:not(.dataTables_empty) {
-                    background-color: $table-bg-hover;
-                }
+            &:hover > td:not(.dataTables_empty) {
+                background-color: $table-bg-hover;
             }
+        }
 
-            // details rows
-            > tr.child > td.child {
-                border-top: hidden;
-                //background-color: $brand-primary-med-light;
-                padding: 0;
+        // details rows
+        > tr.child > td.child {
+            border-top: hidden;
+            //background-color: $brand-primary-med-light;
+            padding: 0;
 
-                table {
-                    margin-left: 15px;
-                    border-collapse: separate;
-                    border-spacing: 10px;
-                }
+            table {
+                margin-left: 15px;
+                border-collapse: separate;
+                border-spacing: 10px;
             }
         }
     }
