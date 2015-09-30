@@ -149,14 +149,21 @@ uses:
 * drop jQuery DataTables, it is just too fat and slow (takes at least 500ms to display *after* the page
     has been rendered, and with just around 150 items it slows down to 1.5s)
 * reimplement the DataTables features using what Derby already provides, as well as using:
-    - Responsive Table plugins:
+    - [responsive table demos](http://elvery.net/demo/responsive-tables/)
+    - responsive table plugins:
         * [basic table](https://github.com/jerrylow/basictable) ([demo](http://www.jerrylow.com/basictable/demo/))
         * [tablesaw](https://github.com/filamentgroup/tablesaw) ([stack table demo](http://filamentgroup.github.io/tablesaw/demo/stackonly.html))
         * [pure CSS stacked table](https://css-tricks.com/examples/ResponsiveTables/responsive.php)
         * alternative using scrolling: [zurb](http://zurb.com/playground/responsive-tables)
         * another good advanced one: http://fooplugins.github.io/FooTable/docs/getting-started.html
           I'm just not sure yet if this one does too much to the DOM to combine it with Derby
-
+    - resize table columns:
+        - [colResizable](https://github.com/alvaro-prieto/colResizable)
+        - [jquery-resizable-columns](http://dobtco.github.io/jquery-resizable-columns)
+    - reorder table columns:
+        - http://stackoverflow.com/questions/16660672/reorder-div-table-cells-using-media-queries
+        - http://stackoverflow.com/questions/19144985/flexbox-box-ordinal-group-on-table-cells
+        - [dragtable](http://akottr.github.io/dragtable/)
 
 ## License
 
