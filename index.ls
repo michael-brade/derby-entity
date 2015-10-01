@@ -256,7 +256,7 @@ export class Entity
 
                         return if data then $('<table/>').append(data) else false
 
-            data: @entitiesApi.getItems @entity.id
+            data: @entitiesApi.items @entity.id
             rowId: 'id'
 
             order: [[ 1, "asc" ]]
@@ -283,7 +283,7 @@ export class Entity
                         attr = @entity.attributes[col - 1]
                         throw new Error("attribute #{col - 1} not found for #{entityId}!") if not attr
 
-                        @entitiesApi.renderAttribute(
+                        @entitiesApi.render(
                             data,
                             attr,
                             @page.l(@model.get("$locale")),
@@ -362,7 +362,7 @@ export class Entity
                     for ref in that
                         references += "<li>" +
                             _this.page.t(loc, ref.entity.id + '.one') + ": " +
-                            _this.entitiesApi.renderAttribute(ref.item, ref.entity.attributes.name, _this.page.l loc) +
+                            _this.entitiesApi.render(ref.item, ref.entity.attributes.name, _this.page.l loc) +
                         "</li>"
                     return references + "</ul>"
 
@@ -409,14 +409,11 @@ export class Entity
     #
     renderAttribute: (item, attr) ->
         return "" if not item
-        @entitiesApi.renderAttribute(
-            item,
-            attr,
-            @page.l(@model.get("$locale")))
+        @entitiesApi.render(item, attr, @page.l(@model.get("$locale")))
 
 
     renderItemName: (item) ->
-        nameAttr = @entitiesApi.getEntity(@entity.id).attributes['name']
+        nameAttr = @entitiesApi.entity(@entity.id).attributes['name']
         @renderAttribute item, nameAttr
 
 
@@ -505,7 +502,7 @@ export class Entity
                 for ref in that
                     references += "<li>" +
                         @page.t(loc, ref.entity.id + '.one') + ": " +
-                        @entitiesApi.renderAttribute(ref.item, ref.entity.attributes.name, @page.l loc) +
+                        @entitiesApi.render(ref.item, ref.entity.attributes.name, @page.l loc) +
                     "</li>"
                 references += "</ul>"
 
