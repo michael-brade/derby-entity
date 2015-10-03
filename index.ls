@@ -371,22 +371,23 @@ export class Entity
                 })
         )
 
-        $tbody.on 'click', '> tr > td.actions .action-references', (e) ~>
-            @entitiesApi.fetchAllReferencingEntities @entity.id, (err) ->
-                # fix to center the popover over the icon; currentTarget is never the span
-                e.currentTarget = e.target
+        $tbody.on 'click', '> tr > td.actions .action-references', (e) !~>
+            popover = $(e.target).data('bs.popover')
+            $tr = $(e.target).parents('tr')
 
+            if popover?.isInStateTrue!  # popover is currently being shown
+                popover.hide!
+                $tr.off 'mouseout.entity.popover'
+                return
+
+            refQueries = @entitiesApi.queryReferencingEntities @entity.id
+            @model.fetch refQueries, (err) ~>
+                e.currentTarget = e.target  # fix to center the popover over the icon; currentTarget is never the span
                 $tbody.popover('toggle', e)
 
-                # only register one() once -- better: provide a popover('hide', e)!
-                $tr = $(e.target).parents('tr')
-                if $.hasData($tr[0])
-                    and (events = $._data( $tr[0], 'events' ))
-                    and events.mouseout
-                    and _.find(events.mouseout, (evt) -> evt.namespace == 'entity.popover')
-                        $tr.off 'mouseout.entity.popover'
-                else
-                    $tr.one 'mouseout.entity.popover', -> $tbody.popover('toggle', e)
+                @model.unfetch refQueries   # unfetch again to get a new result next time
+
+                $tr.one 'mouseout.entity.popover', -> $tbody.popover('toggle', e)
 
 
     keyActions: (e) ->
@@ -407,14 +408,9 @@ export class Entity
 
     ## Given an item, render its attribute and return the html
     #
-    renderAttribute: (item, attr) ->
-        return "" if not item
-        @entitiesApi.render(item, attr, @page.l(@model.get("$locale")))
-
-
     renderItemName: (item) ->
-        nameAttr = @entitiesApi.entity(@entity.id).attributes['name']
-        @renderAttribute item, nameAttr
+        return "" if not item
+        @entitiesApi.render(item, @entity.id, @page.l(@model.get("$locale")))
 
 
     /** Create a new item. */
@@ -493,13 +489,17 @@ export class Entity
         closeCallback!
 
     remove: (id) ->
-        @entitiesApi.fetchAllReferencingEntities @entity.id, (err) ~>
+        refQueries = @entitiesApi.queryReferencingEntities @entity.id
+        @model.fetch refQueries, (err) ~>
+            itemRefs = @entitiesApi.itemReferences id, @entity.id
+            @model.unfetch refQueries   # unfetch again to get a new result next time
+
             # check if the item to be deleted is still referenced
-            if @entitiesApi.itemReferences id, @entity.id
+            if itemRefs
                 references = "<ul>"
                 loc = @model.get("$locale")
 
-                for ref in that
+                for ref in itemRefs
                     references += "<li>" +
                         @page.t(loc, ref.entity.id + '.one') + ": " +
                         @entitiesApi.render(ref.item, ref.entity.attributes.name, @page.l loc) +
