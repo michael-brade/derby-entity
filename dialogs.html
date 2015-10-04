@@ -1,14 +1,16 @@
 <index:>
     <!-- Modal Dialogs -->
 
-    <modal as="deleteModal" on-close="closeDeleteModal()">
-        <title>{{t($locale, 'dialogs.deleteEntityTitle', { 'ENTITY': t($locale, entity.id + '.one') })}}</title>
+    {{if _page.itemToBeDeleted}}
+        <modal as="deleteModal" on-close="closeDeleteModal()">
+            <title>{{t($locale, 'dialogs.deleteEntityTitle', { 'ENTITY': t($locale, entity.id + '.one') })}}</title>
 
-        {{t($locale, 'messages.deleteEntity', { 'ENTITY': t($locale, entity.id + '.one') })}}
-        <p class="text-center">
-            <strong>{{renderItemName(_page.itemToBeDeleted)}}</strong>
-        </p>
+            {{t($locale, 'messages.deleteEntity', { 'ENTITY': t($locale, entity.id + '.one') })}}
+            <p class="text-center">
+                <strong>{{unescaped renderItemName(_page.itemToBeDeleted)}}</strong>
+            </p>
 
-        <action name='delete' class="btn-primary" autofocus default>{{t($locale, 'actions.delete')}}</action>
-        <action name='cancel'>{{t($locale, 'actions.cancel')}}</action>
-    </modal>
+            <action name='delete' class="btn-primary" autofocus default>{{t($locale, 'actions.delete')}}</action>
+            <action name='cancel'>{{t($locale, 'actions.cancel')}}</action>
+        </modal>
+    {{/}}

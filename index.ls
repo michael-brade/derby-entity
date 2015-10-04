@@ -281,14 +281,12 @@ export class Entity
                         try col = api.colReorder.order()[meta.col]
 
                         attr = @entity.attributes[col - 1]
-                        throw new Error("attribute #{col - 1} not found for #{entityId}!") if not attr
+                        throw new Error("attribute #{col - 1} not found for #{@entity.id}!") if not attr
 
-                        @entitiesApi.render(
-                            data,
-                            attr,
-                            @page.l(@model.get("$locale")),
-                            if type == 'display' then api.cell(meta.row, col).node() else undefined /* == parent node */
-                        )
+                        if type == 'display'
+                            @entitiesApi.render(data, attr, @page.l(@model.get("$locale")), api.cell(meta.row, col).node())
+                        else
+                            @entitiesApi.renderAsText(data, attr, @page.l(@model.get("$locale")))
 
                 *   targets: "actions"
                     className: "actions"
@@ -486,6 +484,7 @@ export class Entity
         if action == 'delete'
             @remove @model.get("_page.itemToBeDeleted.id")
 
+        @model.set "_page.itemToBeDeleted", undefined
         closeCallback!
 
     remove: (id) ->
