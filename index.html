@@ -1,25 +1,11 @@
+<import: src='./table/datatables'>
+<import: src='./table/native'>
+
 <import: src='./dialogs'>
 <import: src='./item-edit'>
 
 <index:>
-    {{on _page.recreateTable}}
-        {{unbound}}
-            <table as="table" id="{{entity.id}}" class="table table-condensed compact no-text-selection" width="100%">
-                <thead>
-                    <tr>
-                        <th class="respond"></th> <!-- for the child row expansion -->
-
-                        {{each entity.attributes as #col}}
-                            <th class="attr">{{t($locale, entity.id + '.' + #col.id)}}</th>
-                        {{/each}}
-
-                        <!-- the Action column is "all"-ways visible -->
-                        <th class="all actions" data-width="30">{{t($locale, 'actions.title')}}</th>
-                    </tr>
-                </thead>
-            </table>
-        {{/}}
-    {{/}}
+    <view name="{{table()}}:items-table" />
 
     {{if _page.item}}
         <view name="item-edit" />
