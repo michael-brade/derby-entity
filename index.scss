@@ -4,13 +4,15 @@
 // Then import the global defaults so that changes cascade
 @import 'bootstrap/variables';
 
+@import 'compass/css3/border-radius';
+
 $fa-font-path: '/fonts/font-awesome';
 @import 'fontawesome/scss/font-awesome';
 
+
+// datatables
 @import 'datatables/dataTables.bootstrap.css';
 @import 'datatables/dataTables.fontAwesome.css';
-
-@import 'compass/css3/border-radius';
 
 // ColReorder
 $colreorder-insert-color: $brand-secondary;
@@ -20,6 +22,11 @@ $colreorder-insert-color: $brand-secondary;
 $open-button-color: $brand-primary;
 $close-button-color: $brand-primary;
 @import 'datatables/responsive.dataTables';
+
+
+// derby-entities-lib
+@import 'derby-entities-lib/types/color';
+@import 'derby-entities-lib/types/image';
 
 
 @mixin round-corners($radius, $adjust-top: 0px) {
@@ -50,20 +57,6 @@ $close-button-color: $brand-primary;
     }
 }
 
-// TODO: where to put the following three?
-.img-preview {
-    max-height: 100px;
-}
-
-.thumbnail {
-    display: inline-block;
-    margin-bottom: 0;
-
-}
-.caption {
-    padding: 5px;
-    text-align: center;
-}
 
 .dataTables_wrapper {
     .dt-control {
