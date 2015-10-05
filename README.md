@@ -1,6 +1,6 @@
-# A Perfect Derby CRUD Component
+# A Perfect DerbyJS CRUD Component
 
-This is a completely generic, responsive, and realtime collaborative Derby component to create, read, update,
+This is a completely generic, responsive, and realtime collaborative DerbyJS component to create, read, update,
 and delete entities in a database using Racer. The items of an entity are displayed using
 the great jQuery DataTables plugin. Realtime collaboration and conflict resolution is achieved
 through RacerJS and ShareJS.
@@ -16,36 +16,37 @@ TODO
 
 ## Prerequisites
 
+`derby-entity` depends on the following packages:
+
 * **LiveScript**: this component is written in LiveScript, so add `require('livescript');` to your `server.js` and `liveify`
   to browserify transforms
-* **lodash**
-* **my Derby 0.6 fork** because I added
+* **[my Derby 0.6 fork](https://github.com/michael-brade/derby)** because I added
     - support for LiveScript components
     - support for component styles
     - support for subcomponents
   all of which are needed for derby-entity.
-* **derby-entities-lib**, which contains some purely model- and entity-specific functions that are needed and shared by
-  derby-entity and derby-entity-visualization
-* **derby-entity-select2**
+* **[derby-entities-lib](https://github.com/michael-brade/derby-entities-lib)**, which contains some purely model- and
+    entity-specific functions as well as view components that are needed and shared by derby-entity and derby-entity-visualization
+* **[derby-entity-select2](https://github.com/michael-brade/derby-entity-select2)**
 * **derby-sass** for being able to compile scss files on the fly... actually, a better way is to do it using gulp, see below.
-* **derby-modal**
+* **modal from [d-comp-palette](https://github.com/shuslav/d-comp-palette)**
 * i18n: **derby-lang** and **derby-locale**, plus the following shortcut view functions:
     - `l($locale)` to return the current lowercase locale (en, de, ...)
     - `t($locale, path, params)` to return the translation of path in the current locale
   See below for detailed i18n information.
 * a browserify bundle that provides jQuery and exposes the following DataTables requires:
-
-      require('datatables')
-      require('datatables.bootstrap')
-      require('datatables.responsive')
-      require('datatables.colReorder')
-      require('datatables.colResize')
-      require('jquery.highlight')
-      require('datatables.searchHighlight')
-
-* **my Bootstrap fork** where I added proper placement support for popovers when combining `trigger: manual` with
-`container` and `selector`
-* **Font-Awesome**
+```
+require('datatables')
+require('datatables.bootstrap')
+require('datatables.responsive')
+require('datatables.colReorder')
+require('datatables.colResize')
+require('jquery.highlight')
+require('datatables.searchHighlight')
+```
+* **[my Bootstrap fork](https://github.com/michael-brade/bootstrap)** where I added proper placement support for popovers
+    when combining `trigger: manual` with `container` and `selector`.
+* **Font-Awesome**, use bower for that one.
 
 
 ## Usage
@@ -65,7 +66,8 @@ In addition to that, each entity attribute needs to be defined.
 
 The actions and dialogs of this component are using these strings:
 
-* actions
+```
+actions
 {
     "title": "Actions",
 
@@ -75,9 +77,9 @@ The actions and dialogs of this component are using these strings:
     "delete": "Delete",
     "done": "Done",
     "cancel": "Cancel"
-}
+},
 
-* dialogs
+dialogs
 {
     "deleteEntityTitle": "Delete {ENTITY}",
 
@@ -85,24 +87,25 @@ The actions and dialogs of this component are using these strings:
     "referencePopoverUnused": "This {ENTITY} is not referenced."
 },
 
-* messages
+messages
 {
     "entityAdded": "New {ENTITY} \"{ITEM}\" added.",
     "deleteEntity": "Do you really want to delete this {ENTITY}?",
     "entityDeleted": "{ENTITY} \"{ITEM}\" deleted.",
     "itemReferenced": "Cannot delete {ENTITY} because it is still referenced by:"
 }
-
+```
 
 ### Style
 
 To be more flexible I added some fine-graned color definition variables to the standard `$brand-primary`. derby-entity
 uses:
+```sass
     $brand-primary
     $brand-primary-light
     $brand-secondary
     $brand-aux-1-med-light
-
+```
 
 #### Compilation
 
@@ -145,7 +148,7 @@ uses:
 
 ## TODO
 
-* create a proper NPM package
+* more documentation...
 * drop jQuery DataTables, it is just too fat and slow (takes at least 500ms to display *after* the page
     has been rendered, and with just around 150 items it slows down to 1.5s)
 * reimplement the DataTables features using what Derby already provides, as well as using:
