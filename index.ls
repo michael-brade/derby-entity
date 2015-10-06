@@ -25,6 +25,8 @@ export class Entity extends Table
     components:
         require('d-comp-palette/modal/modal')
 
+        require('derby-entities-lib/item/item')
+
         require('derby-entities-lib/types/text')
         require('derby-entities-lib/types/textarea')
         require('derby-entities-lib/types/number')

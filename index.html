@@ -2,13 +2,19 @@
 <import: src='./table/native'>
 
 <import: src='./dialogs'>
-<import: src='./item-edit'>
+
 
 <index:>
     <view name="{{table()}}:items-table" />
 
     {{if _page.item}}
-        <view name="item-edit" />
+        <div class="clearfix"></div>
+
+        <legend>
+            {{t($locale, 'actions.edit')}} {{t($locale, entity.id + '.one')}}
+        </legend>
+
+        <view name="item" mode="edit" item="{{_page.item}}" entity="{{entity}}" />
     {{else}}
         <a class="btn btn-primary pull-right" on-click="add()" role="button">
             {{ t($locale, 'actions.new', { 'ITEM': t($locale, entity.id + '.one') }) }}
