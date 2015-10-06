@@ -210,9 +210,9 @@ export class Table
                         #return "string"
 
                         if type == 'display'
-                            @entitiesApi.render(data, attr, @page.l(@model.get("$locale")), api.cell(meta.row, col).node())
+                            @entitiesApi.render(data, attr, api.cell(meta.row, col).node())
                         else
-                            @entitiesApi.renderAsText(data, attr, @page.l(@model.get("$locale")))
+                            @entitiesApi.renderAsText(data, attr)
 
                 *   targets: "actions"
                     className: "actions"
@@ -292,7 +292,7 @@ export class Table
                     for ref in that
                         references += "<li>" +
                             _this.page.t(loc, ref.entity.id + '.one') + ": " +
-                            _this.entitiesApi.render(ref.item, ref.entity.attributes.name, _this.page.l loc) +
+                            _this.entitiesApi.render(ref.item, ref.entity.attributes.name) +
                         "</li>"
                     return references + "</ul>"
 

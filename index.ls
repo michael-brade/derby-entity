@@ -124,8 +124,8 @@ export class Entity extends Table
     ## Given an item, render its attribute and return the html
     #
     renderItemName: (item) ->
-        return "" if not item
-        @entitiesApi.render(item, @entity.id, @page.l(@model.get("$locale")))
+        # TODO: try to use the view with get! here so that render can eventually be dropped from the API
+        @entitiesApi.render(item, @entity.id)
 
 
     /** Create a new item. */
@@ -221,7 +221,7 @@ export class Entity extends Table
                 for ref in itemRefs
                     references += "<li>" +
                         @page.t(loc, ref.entity.id + '.one') + ": " +
-                        @entitiesApi.render(ref.item, ref.entity.attributes.name, @page.l loc) +
+                        @entitiesApi.render(ref.item, ref.entity.attributes.name) +
                     "</li>"
                 references += "</ul>"
 
