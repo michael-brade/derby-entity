@@ -7,7 +7,9 @@
 
             {{t($locale, 'messages.deleteEntity', { 'ENTITY': t($locale, entity.id + '.one') })}}
             <p class="text-center">
-                <strong>{{unescaped renderItemName(_page.itemToBeDeleted)}}</strong>
+                <strong>
+                    <view name="item" mode="html" item="{{_page.itemToBeDeleted}}" entity="{{entity}}" />
+                </strong>
             </p>
 
             <action name='delete' class="btn-primary" autofocus default>{{t($locale, 'actions.delete')}}</action>
