@@ -161,7 +161,7 @@ export class Entity extends Table
 
         $tr = @dtApi.select(id)
         @dtApi.row($tr).show!
-        $(@form).find(':input[type!=hidden]').first().focus()
+        $(@page.item-form).find(':input[type!=hidden]').first().focus()
         @startValidation!
 
 
