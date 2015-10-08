@@ -159,8 +159,7 @@ export class Entity extends Table
             # destroyed and recreated, so don't.
             @app.history.push(@app.pathFor(@entity.id, id), false)
 
-        $tr = @dtApi.select(id)
-        @dtApi.row($tr).show!
+        super? id
         $(@page.item-form).find(':input[type!=hidden]').first().focus()
         @startValidation!
 
@@ -168,13 +167,7 @@ export class Entity extends Table
     deselect: (push = true) ->
         return if not @item.get!
 
-        $tr = @dtApi.deselect!
-        @dtApi.row($tr).show!
-
-        # scroll back into view
-        $tr[0].scrollIntoView!
-        if $tr.offset().top < $(window).scrollTop! + $(window).height() / 3
-            $(window).scrollTop( $(window).scrollTop! - $(window).height() / 3 )
+        super? ...
 
         @stopValidation!
         @item.removeRef!
