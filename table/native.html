@@ -17,13 +17,14 @@
                 <tr class="{{if #item === _page.item}}active selected{{/}}" on-click="select(#item.id)">
                     {{each entity.attributes as #attr}}
                         <td>
-                            <view name="{{#attr.type}}" mode="html"
-                                  item="{{#item}}" attr="{{#attr}}" loc="{{l($locale)}}" />
+                            <view name="{{#attr.type}}" mode="html" item="{{#item}}" attr="{{#attr}}" />
                         </td>
                     {{/each}}
 
                     <td>
-                        <span class="glyphicon glyphicon-remove" on-click="remove(#item.id)"></span>
+                        <span class="action-references" on-click="showReferences(#item)"><i class="fa fa-external-link"></i></span>
+                        &nbsp;
+                        <span class="action-remove" on-click="showDeleteModal(#item)"><i class="fa fa-remove"></i></span>
                     </td>
                 </tr>
             {{/each}}
