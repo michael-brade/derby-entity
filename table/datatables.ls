@@ -103,7 +103,7 @@ export class Table
 
     createTable: !->
         settings =
-            language: @model.root.get("$lang.dict.strings." + @page.l(@model.get("$locale")) + ".dataTables")
+            language: @model.root.get("$lang.dict.strings." + @model.get("$locale.locale") + ".dataTables")
             autowidth: true    # takes cpu, see also column.width
             #lenghthChange: false
 
@@ -201,7 +201,7 @@ export class Table
 
                         # @setAttribute("attrData", data[attr.id])
                         # @setAttribute("attr", attr)
-                        # @setAttribute("loc", @page.l(@model.get("$locale")))
+                        # @setAttribute("loc", @model.get("$locale.locale"))
                         # view = @get attr.type
 
                         # console.log locale
@@ -328,7 +328,7 @@ export class Table
     deselect: (push = true) ->
         $tr = @dtApi.deselect!
         @dtApi.row($tr).show!
-        
+
         # scroll back into view
         $tr[0].scrollIntoView!
         if $tr.offset().top < $(window).scrollTop! + $(window).height() / 3
