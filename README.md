@@ -24,17 +24,18 @@ TODO
     - support for LiveScript components
     - support for component styles
     - support for subcomponents
-  all of which are needed for derby-entity.
+  all of which are needed for derby-entity. Also, this fork pulls in my additions to `racer`.
 * **[derby-entities-lib](https://github.com/michael-brade/derby-entities-lib)**, which contains some purely model- and
     entity-specific functions as well as view components that are needed and shared by derby-entity and derby-entity-visualization
 * **[derby-entity-select2](https://github.com/michael-brade/derby-entity-select2)**
-* **derby-sass** for being able to compile scss files on the fly... actually, a better way is to do it using gulp, see below.
+* **[derby-sass](https://github.com/michael-brade/derby-sass)** for being able to compile scss files on the fly... actually, a better way is to do it using gulp, see below.
 * **modal from [d-comp-palette](https://github.com/shuslav/d-comp-palette)**
-* i18n: **derby-lang** and **derby-locale**, plus the following shortcut view functions:
-    - `l($locale)` to return the current lowercase locale (en, de, ...)
-    - `t($locale, path, params)` to return the translation of path in the current locale
+* i18n: **derby-lang**, **[derby-lang-locale](https://github.com/michael-brade/derby-lang-locale)** and
+  **[derby-locale](https://github.com/michael-brade/derby-locale)**, plus the following shortcuts:
+    - model path `$locale.locale` to point the current lowercase locale (en, de, ...)
+    - view function `t($locale, path, params)` to return the translation of path in the current locale
   See below for detailed i18n information.
-* a browserify bundle that provides jQuery and exposes the following DataTables requires:
+* a browserify bundle that provides `jQuery` and exposes the following DataTables requires:
 ```
 require('datatables')
 require('datatables.bootstrap')
