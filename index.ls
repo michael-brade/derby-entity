@@ -39,8 +39,6 @@ export class Entity extends Table
 
     # This is basically the CTOR. Called when the component is instantiated.
     init: (model) !->
-        # console.warn "Entity INIT", @getAttribute("entity").id
-
         model.ref('$locale', model.root.at('$locale'))
 
         @entity = @getAttribute("entity")
@@ -50,11 +48,6 @@ export class Entity extends Table
         model.ref '_page.items', @items.filter(null)    # make items available in the local model as a list with a null-filter
 
         @entitiesApi = EntitiesApi.instance!
-
-        # make all dependent entity items available as lists under "_page.<entity id>"
-        @entity.attributes.forEach (attr) ->
-            if (attr.type == 'entity')
-                model.ref '_page.' + attr.entity, model.root.filter(attr.entity, null)
 
 
     /* Called after the view is rendered. It is possible to use jQuery in here.
