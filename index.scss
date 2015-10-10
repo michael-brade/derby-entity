@@ -4,30 +4,13 @@
 // Then import the global defaults so that changes cascade
 @import 'bootstrap/variables';
 
-@import 'compass/css3/border-radius';
 
+// FontAwesome - TODO: move to global
 $fa-font-path: '/fonts/font-awesome';
 @import 'fontawesome/scss/font-awesome';
 
 
-// datatables
-@import 'datatables/dataTables.bootstrap.css';
-@import 'datatables/dataTables.fontAwesome.css';
-
-// ColReorder
-$colreorder-insert-color: $brand-secondary;
-@import 'datatables/colReorder.dataTables';
-
-// Responsive
-$open-button-color: $brand-primary;
-$close-button-color: $brand-primary;
-@import 'datatables/responsive.dataTables';
-
-
-// derby-entities-lib
-@import 'derby-entities-lib/types/color';
-@import 'derby-entities-lib/types/image';
-
+@import 'compass/css3/border-radius';
 
 @mixin round-corners($radius, $adjust-top: 0px) {
     &:first-child {
@@ -38,6 +21,18 @@ $close-button-color: $brand-primary;
         @include border-radius(0 ($radius + $adjust-top) $radius 0);
     }
 }
+
+
+// datatables
+//@import './table/datatables';
+
+// native
+@import './table/native';
+
+// derby-entities-lib
+@import 'derby-entities-lib/types/color';
+@import 'derby-entities-lib/types/image';
+
 
 
 .animate-selection td {
@@ -58,69 +53,20 @@ $close-button-color: $brand-primary;
 }
 
 
-.dataTables_wrapper {
-    .dt-control {
-        display: flex;
-        width: 100%;
-
-        //justify-content: space-between; // not needed due to margin-*: auto below
-        align-items: center;
-
-        label {
-            margin: 0;
-        }
-
-        .dataTables_length {
-            margin-right: auto;
-        }
-
-        .dataTables_filter {
-            margin-left: auto;
-        }
-    }
-
-    .dataTables_paginate {
-        float: left;
-    }
-}
-
-
-table.dataTable span.highlight {
+span.highlight {
   //background-color: $brand-info;
   background-color: $brand-aux-1-med-light;
 }
 
+table.table-condensed {
+    background-color: #fcf8e3;
 
-table.dataTable.table-condensed {
     > thead {
         > tr > th {
             @include round-corners($border-radius-base);
             border: 0;
             background-color: $brand-primary;
-
-            // sort icons
-            padding-right: 5px;
-
-            &.sorting:after,
-            &.sorting_asc:after,
-            &.sorting_desc:after,
-            &.sorting_asc_disabled:after,
-            &.sorting_desc_disabled:after {
-                display: inline;
-                position: static;
-                padding-left: 5px;
-            }
-
-            &.sorting:after {
-                opacity: 0.5;
-                color: $brand-primary-light;
-            }
         }
-    }
-
-    // sort columns
-    > tbody > tr > td.sorting_1 {
-        background-color: #fcf8e3;    // TODO: use variable, darken $brand-primary-light?
     }
 
 
@@ -140,7 +86,7 @@ table.dataTable.table-condensed {
 
         > tr:not(.child) {
             // cursor
-            > td:not(.actions):not(.dataTables_empty):not(.control) {
+            > td:not(.actions):not(#{$empty-table}):not(.control) {
                 cursor: pointer;
             }
 
@@ -148,7 +94,7 @@ table.dataTable.table-condensed {
 
             &:hover,
             &.selected {
-                > td:not(.dataTables_empty) {
+                > td:not(#{$empty-table}) {
                     @supports (-webkit-appearance:none) {
                         border-top: 1px solid $brand-primary-light;        // solid is more specific than dotted
                         border-bottom: 1px solid $brand-primary-light;
@@ -164,25 +110,12 @@ table.dataTable.table-condensed {
                 }
             }
 
-            &.selected > td:not(.dataTables_empty) {
+            &.selected > td:not(#{$empty-table}) {
                 background-color: $table-bg-selected;
             }
 
-            &:hover > td:not(.dataTables_empty) {
+            &:hover > td:not(#{$empty-table}) {
                 background-color: $table-bg-hover;
-            }
-        }
-
-        // details rows
-        > tr.child > td.child {
-            border-top: hidden;
-            //background-color: $brand-primary-med-light;
-            padding: 0;
-
-            table {
-                margin-left: 15px;
-                border-collapse: separate;
-                border-spacing: 10px;
             }
         }
     }
