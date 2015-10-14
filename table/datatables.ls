@@ -283,55 +283,5 @@ export class Table
             @showDeleteModal @dtApi.row( $(e.target).parents('tr') ).data!
 
         # references
-        _this = this
-        $tbody.popover(
-            placement: 'top'
-            selector: 'span.action-references i'
-            container: '#' + _this.entity.id
-            viewport:
-                selector: '#' + _this.entity.id
-                padding: 0
-
-            trigger: 'manual'
-
-            html: true
-            title: ->
-                item = _this.dtApi.row( $(this).parents('tr') ).data!
-                name = _this.renderItemName item
-                _this.page.t(_this.model.get("$locale"), 'dialogs.referencePopoverTitle', { ITEM: name })
-
-            content: ->
-                itemId = _this.dtApi.row( $(this).parents('tr') ).id!
-                loc = _this.model.get("$locale")
-
-                if _this.entitiesApi.itemReferences itemId, _this.entity.id
-                    references = "<ul>"
-                    for ref in that
-                        references += "<li>" +
-                            _this.page.t(loc, ref.entity.id + '.one') + ": " +
-                            _this.entitiesApi.render(ref.item, ref.entity.attributes.name) +
-                        "</li>"
-                    return references + "</ul>"
-
-                _this.page.t(loc, 'dialogs.referencePopoverUnused', {
-                    ENTITY: _this.page.t(loc, _this.entity.id + '.one')
-                })
-        )
-
         $tbody.on 'click', '> tr > td.actions .action-references', (e) !~>
-            popover = $(e.target).data('bs.popover')
-            $tr = $(e.target).parents('tr')
-
-            if popover?.isInStateTrue!  # popover is currently being shown
-                popover.hide!
-                $tr.off 'mouseout.entity.popover'
-                return
-
-            refQueries = @entitiesApi.queryReferencingEntities @entity.id
-            @model.fetch refQueries, (err) ~>
-                e.currentTarget = e.target  # fix to center the popover over the icon; currentTarget is never the span
-                $tbody.popover('toggle', e)
-
-                @model.unfetch refQueries   # unfetch again to get a new result next time
-
-                $tr.one 'mouseout.entity.popover', -> $tbody.popover('toggle', e)
+            @showReferences e

@@ -1,6 +1,7 @@
 require! {
     lodash: _
     './table/datatables': { Table }
+    # './table/native': { Table }
     'derby-entities-lib/api': EntitiesApi
 }
 
@@ -69,8 +70,6 @@ export class Entity extends Table
      */
     create: (model, dom) ->
         super ...
-        #console.warn "Entity CREATE", @getAttribute("entity").id
-
 
         #dom.on 'keydown', (e) ~>   # this registers several dom listeners
 
@@ -78,6 +77,47 @@ export class Entity extends Table
 
         @on 'destroy', ~>
             $(document).off 'keydown'
+
+
+
+        # REFERENCES POPOVER INITIALIZATION
+
+        _this = this
+
+        $(@table).popover(
+            placement: 'top'
+            selector: 'span.action-references i'
+            container: '#' + _this.entity.id
+            viewport:
+                selector: '#' + _this.entity.id
+                padding: 0
+
+            trigger: 'manual'
+
+            html: true
+            title: ->
+                itemId = $(this).parents('tr').attr('id')
+                _this.page.t(_this.model.get("$locale"), 'dialogs.referencePopoverTitle', {
+                    ITEM: _this.renderItemName _this.items.get(itemId)
+                })
+
+            content: ->
+                itemId = $(this).parents('tr').attr('id')
+                loc = _this.model.get("$locale")
+
+                if _this.entitiesApi.itemReferences itemId, _this.entity.id
+                    references = "<ul>"
+                    for ref in that
+                        references += "<li>" +
+                            _this.page.t(loc, ref.entity.id + '.one') + ": " +
+                            _this.entitiesApi.render(ref.item, ref.entity.attributes.name) +
+                        "</li>"
+                    return references + "</ul>"
+
+                _this.page.t(loc, 'dialogs.referencePopoverUnused', {
+                    ENTITY: _this.page.t(loc, _this.entity.id + '.one')
+                })
+        )
 
 
 
@@ -182,6 +222,29 @@ export class Entity extends Table
                 @app.history.replace(@app.pathFor(@entity.id), false)
 
 
+    showReferences: (event) ->
+        # copy native event because currentTarget will be null after @model.fetch
+        e = {}
+        for k, v of event
+             e[k] = v
+
+        popover = $(e.target).data('bs.popover')
+        $tr = $(e.target).parents('tr')
+
+        if popover?.isInStateTrue!  # popover is currently being shown
+            popover.hide!
+            $tr.off 'mouseout.entity.popover'
+            return
+
+        refQueries = @entitiesApi.queryReferencingEntities @entity.id
+        @model.fetch refQueries, (err) ~>
+            $(@table).popover('toggle', e)
+
+            @model.unfetch refQueries   # unfetch again to get a new result next time
+
+            $tr.one 'mouseout.entity.popover', ~> $(@table).popover('toggle', e)
+
+
     showDeleteModal: (item) ->
         @model.set "_page.itemToBeDeleted", item
         @deleteModal.show!
@@ -220,6 +283,7 @@ export class Entity extends Table
 
             # actually delete the item
             @items.del(id)
+
 
 
     entityMessage: (item, message) ->
