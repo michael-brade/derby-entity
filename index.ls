@@ -152,15 +152,15 @@ export class Entity extends Table
             # destroyed and recreated, so don't.
             @app.history.push(@app.pathFor(@entity.id, id), false)
 
-        super? id
-        $(@page.item-form).find(':input[type!=hidden]').first().focus()
+        super id
+        $(@itemForm.form).find(':input[type!=hidden]').first().focus()
         @startValidation!
 
 
     deselect: (push = true) ->
         return if not @item.get!
 
-        super? ...
+        super ...
 
         @stopValidation!
         @item.removeRef!

@@ -69,6 +69,23 @@ export class Table
             requestAnimationFrame !-> row.remove!.draw false    # false means: stay on current page
 
 
+    select: (id) ->
+        $tr = @dtApi.select(id)
+        @dtApi.row($tr).show!
+
+    deselect: ->
+        $tr = @dtApi.deselect!
+        @dtApi.row($tr).show!
+
+        # scroll back into view
+        $tr[0].scrollIntoView!
+        if $tr.offset().top < $(window).scrollTop! + $(window).height() / 3
+            $(window).scrollTop( $(window).scrollTop! - $(window).height() / 3 )
+
+
+    /*** PUBLIC API ENDS HERE ***/
+
+
     registerDataTablesPlugins: !->
         $.fn.dataTable.Api.register 'deselect()', ->
             $tr = this.$('tr.selected').addClass('animate-selection')
@@ -318,18 +335,3 @@ export class Table
                 @model.unfetch refQueries   # unfetch again to get a new result next time
 
                 $tr.one 'mouseout.entity.popover', -> $tbody.popover('toggle', e)
-
-
-
-    select: (id) ->
-        $tr = @dtApi.select(id)
-        @dtApi.row($tr).show!
-
-    deselect: (push = true) ->
-        $tr = @dtApi.deselect!
-        @dtApi.row($tr).show!
-
-        # scroll back into view
-        $tr[0].scrollIntoView!
-        if $tr.offset().top < $(window).scrollTop! + $(window).height() / 3
-            $(window).scrollTop( $(window).scrollTop! - $(window).height() / 3 )

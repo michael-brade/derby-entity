@@ -13,10 +13,9 @@
 
         <tbody>
             {{each _page.items as #item, #index}}
-                <!-- do we need id="{{#item.id}}" ?? -->
-                <tr class="{{if #item === _page.item}}active selected{{/}}" on-click="select(#item.id)">
+                <tr id="{{#item.id}}">
                     {{each entity.attributes as #attr}}
-                        <td>
+                        <td on-click="select(#item.id)">
                             <view name="{{#attr.type}}" mode="html" item="{{#item}}" attr="{{#attr}}" />
                         </td>
                     {{/each}}
