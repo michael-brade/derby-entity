@@ -20,21 +20,30 @@ TODO
 
 * **LiveScript**: this component is written in LiveScript, so add `require('livescript');` to your `server.js` and `liveify`
   to browserify transforms
+
 * **[my Derby 0.6 fork](https://github.com/michael-brade/derby)** because I added
     - support for LiveScript components
     - support for component styles
     - support for subcomponents
+
   all of which are needed for derby-entity. Also, this fork pulls in my additions to `racer`.
 * **[derby-entities-lib](https://github.com/michael-brade/derby-entities-lib)**, which contains some purely model- and
     entity-specific functions as well as view components that are needed and shared by derby-entity and derby-entity-visualization
+
 * **[derby-entity-select2](https://github.com/michael-brade/derby-entity-select2)**
+
 * **[derby-sass](https://github.com/michael-brade/derby-sass)** for being able to compile scss files on the fly... actually, a better way is to do it using gulp, see below.
+
 * **modal from [d-comp-palette](https://github.com/shuslav/d-comp-palette)**
+
 * i18n: **derby-lang**, **[derby-lang-locale](https://github.com/michael-brade/derby-lang-locale)** and
   **[derby-locale](https://github.com/michael-brade/derby-locale)**, plus the following shortcuts:
+
     - model path `$locale.locale` to point the current lowercase locale (en, de, ...)
     - view function `t($locale, path, params)` to return the translation of path in the current locale
+
   See below for detailed i18n information.
+
 * in case you want the DataTables implementation: a browserify bundle that provides `jQuery` and exposes the following
 DataTables requires:
 ```
@@ -46,8 +55,10 @@ require('datatables.colResize')
 require('jquery.highlight')
 require('datatables.searchHighlight')
 ```
+
 * **[my Bootstrap fork](https://github.com/michael-brade/bootstrap)** where I added proper placement support for popovers
     when combining `trigger: manual` with `container` and `selector`.
+
 * **Font-Awesome**, use bower for that one.
 
 
@@ -78,6 +89,11 @@ then in your view, use
 
 to instantiate it, and provide it with an `entity` schema object. Optionally, pass along an `item`
 that should already be selected initially.
+
+
+### jQuery DataTables vs native DerbyJS implementation
+
+Depending on which version you want to use, comment the correct line in `index.ls` (line 3 or 4) and `index.scss` (line 27 or 30).
 
 
 ### i18n
