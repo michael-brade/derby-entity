@@ -1,8 +1,8 @@
 # A Perfect DerbyJS CRUD Component
 
 This is a completely generic, responsive, and realtime collaborative DerbyJS component to create, read, update,
-and delete entities in a database using Racer. The items of an entity are displayed using
-the great jQuery DataTables plugin. Realtime collaboration and conflict resolution is achieved
+and delete entities in a database using Racer. The items of an entity are displayed using either the great jQuery
+DataTables plugin, or a native DerbyJS implementation. Realtime collaboration and conflict resolution is achieved
 through RacerJS and ShareJS.
 
 That said, perfection is hard to achieve and there always seems something more that could be done. You are welcome
@@ -35,7 +35,8 @@ TODO
     - model path `$locale.locale` to point the current lowercase locale (en, de, ...)
     - view function `t($locale, path, params)` to return the translation of path in the current locale
   See below for detailed i18n information.
-* a browserify bundle that provides `jQuery` and exposes the following DataTables requires:
+* in case you want the DataTables implementation: a browserify bundle that provides `jQuery` and exposes the following
+DataTables requires:
 ```
 require('datatables')
 require('datatables.bootstrap')
@@ -54,6 +55,29 @@ require('datatables.searchHighlight')
 
 An object with entity definitions is needed to tell derby-entity what to display, it doesn't analyze the database by
 itself. Each entity, the items of which are to be displayed and edited, has to be defined with all its attributes.
+How that is to be done is documented in [derby-entities-lib](https://github.com/michael-brade/derby-entities-lib).
+
+Since I wanted this component to be really real-time, I created an unusual editing model: there is no cancel or save
+when you select an item, changes are instantly written to the model and visible from all clients. This carries a
+drawback I haven't been able to solve yet: there is no undo (hard to implement with Derby at the moment), and it is
+thus possible to inadvertently change something, maybe even without noticing. I need a good idea on this one. So far
+I thought about saving the current item in local storage as soon as it is changed, but I am not sure if that is an ideal
+way... how to recover it? How to display it?
+
+Now, about technical usage: you need to load the component with
+
+```ls
+app.component require('derby-entity')
+```
+
+then in your view, use  
+
+```html
+<view name="entity" entity="{{_page.entity}}" item="{{_page.item}}" />
+```
+
+to instantiate it, and provide it with an `entity` schema object. Optionally, pass along an `item`
+that should already be selected initially.
 
 
 ### i18n
