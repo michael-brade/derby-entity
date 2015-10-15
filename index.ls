@@ -193,7 +193,7 @@ export class Entity extends Table
             @app.history.push(@app.pathFor(@entity.id, id), false)
 
         super id
-        $(@itemForm.form).find(':input[type!=hidden]').first().focus()
+        @itemForm.focus!
         @startValidation!
 
 
