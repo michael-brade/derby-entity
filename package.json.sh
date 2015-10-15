@@ -2,7 +2,7 @@
 
 name: 'derby-entity'
 description: 'A Perfect DerbyJS CRUD Component'
-version: '1.1.0'
+version: '1.1.1'
 
 author:
     name: 'Michael Brade'
