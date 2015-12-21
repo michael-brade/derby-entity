@@ -1,2 +1,4 @@
-/index.css
-/package.json
+index.css
+package.json
+node_modules
+dist
