@@ -12,6 +12,7 @@ keywords:
     'derby'
     'entity'
     'crud'
+    'table'
 
 
 repository:
@@ -44,14 +45,14 @@ scripts:
 
     # make sure a stash will be created and stash everything not committed
     # beware: --all would be really correct, but it also removes node_modules, so use --include-untracked instead
-    prebuild: 'npm run clean; touch .create_stash && git stash save --include-untracked "npm build stash" && ./package.json.sh ;'
+    prebuild: 'npm run clean; touch .create_stash && git stash save --include-untracked "npm build stash";'
 
     # build the distribution under dist: create directory structure, compile to JavaScript, uglify
     build: "
         export DEST=dist;
         export ASSETS='.*\.scss|.*\.html|./README\.md|./package\.json';
 
-        find -path '*node_modules*' -prune -o -name '*.ls' -print0
+        find -path './node_modules*' -prune -o -name '*.ls' -print0
         | xargs -n1 -0 sh -c '
             echo Compiling and minifying $0...;
             DEST_PATH=\"$DEST/`dirname $0`\";
@@ -60,7 +61,7 @@ scripts:
         ';
 
         echo Copying assets...;
-        find \\( -path './node_modules*' -o -path './dist*' \\) -prune -o -regextype posix-egrep -regex $ASSETS -print0
+        find \\( -path './node_modules*' -o -path \"./$DEST/*\" \\) -prune -o -regextype posix-egrep -regex $ASSETS -print0
         | xargs -n1 -0 sh -c '
             mkdir -p \"$DEST/`dirname \"$0\"`\";
             cp -a \"$0\" \"$DEST/$0\"
@@ -83,7 +84,7 @@ scripts:
     publish: "npm publish dist;"
 
 engines:
-    node: '5.x'
+    node: '4.x || 5.x'
 
 license: 'MIT'
 
