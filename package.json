@@ -17,23 +17,24 @@
     "url": "michael-brade/derby-entity"
   },
   "dependencies": {
-    "lodash": "3.x",
+    "lodash": "4.x",
     "derby-entities-lib": "1.1.x",
     "derby-entity-select2": "1.0.x",
     "derby-ui-toast": "*",
     "d-comp-palette": "*"
   },
   "peerDependencies": {
-    "derby": "michael-brade/derby"
+    "derby": "michael-brade/derby",
+    "derby-router": "*"
   },
   "devDependencies": {
-    "livescript": "1.4.x",
-    "node-sass": "3.4.x",
-    "uglify-js": "2.6.x"
+    "livescript": "1.5.x",
+    "node-sass": "3.8.x",
+    "uglify-js": "2.7.x"
   },
   "scripts": {
     "prebuild": "npm run clean; touch .create_stash && git stash save --include-untracked \"npm build stash\";",
-    "build": "export DEST=dist;export ASSETS='.*.scss|.*.html|./README.md|./package.json';find -path './node_modules*' -prune -o -name '*.ls' -print0| xargs -n1 -0 sh -c 'echo Compiling and minifying $0...;DEST_PATH=\"$DEST/`dirname $0`\";mkdir -p \"$DEST_PATH\";lsc -cp \"$0\" | uglifyjs - -cm -o \"$DEST_PATH/`basename -s .ls \"$0\"`\".js;';echo Copying assets...;find \\( -path './node_modules*' -o -path \"./$DEST/*\" \\) -prune -o -regextype posix-egrep -regex $ASSETS -print0| xargs -n1 -0 sh -c 'mkdir -p \"$DEST/`dirname \"$0\"`\";cp -a \"$0\" \"$DEST/$0\"';echo Done!;",
+    "build": "export DEST=dist;export ASSETS='.*.scss|.*.html|./README.md|./package.json';find -path './node_modules*' -prune -o -name '*.ls' -print0| xargs -n1 -0 sh -c 'echo Compiling and minifying $0...;DEST_PATH=\"$DEST/`dirname $0`\";mkdir -p \"$DEST_PATH\";lsc -cp \"$0\" | uglifyjs - -cm -o \"$DEST_PATH/`basename -s .ls \"$0\"`\".js;';echo \"\u001b[01;32mCopying assets...\u001b[00m\";find \\( -path './node_modules*' -o -path \"./$DEST/*\" \\) -prune -o -regextype posix-egrep -regex $ASSETS -print0| xargs -n1 -0 sh -c 'mkdir -p \"$DEST/`dirname \"$0\"`\";cp -a \"$0\" \"$DEST/$0\"';echo \"\u001b[01;32mDone!\u001b[00m\";",
     "postbuild": "git stash pop --index && rm .create_stash;",
     "clean": "rm -rf dist;",
     "test": "echo \"TODO: no tests specified yet\" && exit 1;",

@@ -1,8 +1,8 @@
 require! {
-    lodash: _
     './table/datatables': { Table }
     # './table/native': { Table }
     'derby-entities-lib/api': EntitiesApi
+    'derby-entities-lib/types': { supportedTypeComponents }
 }
 
 # Display one entity with a table listing all instances and
@@ -23,17 +23,10 @@ export class Entity extends Table
     view: __dirname
     style: __dirname
 
-    components:
-        require('d-comp-palette/modal/modal')
-
-        require('derby-entities-lib/item/item')
-
-        require('derby-entities-lib/types/text')
-        require('derby-entities-lib/types/textarea')
-        require('derby-entities-lib/types/number')
-        require('derby-entities-lib/types/entity')
-        require('derby-entities-lib/types/color')
-        require('derby-entities-lib/types/image')
+    components: [
+        require 'd-comp-palette/modal/modal'
+        require 'derby-entities-lib/item/item' .Item
+    ] ++ supportedTypeComponents
 
     entity: null
     entitiesApi: null

@@ -21,7 +21,7 @@ repository:
 
 dependencies:
     # utils
-    'lodash': '3.x'
+    'lodash': '4.x'
 
     # derby components
     'derby-entities-lib': '1.1.x'
@@ -32,13 +32,13 @@ dependencies:
 
 peerDependencies:
     'derby': 'michael-brade/derby'
-
+    'derby-router': '*'
 
 
 devDependencies:
-    'livescript': '1.4.x'
-    'node-sass': '3.4.x'
-    'uglify-js': '2.6.x'
+    'livescript': '1.5.x'
+    'node-sass': '3.8.x'
+    'uglify-js': '2.7.x'
 
 scripts:
     ## building
@@ -60,14 +60,14 @@ scripts:
             lsc -cp \"$0\" | uglifyjs - -cm -o \"$DEST_PATH/`basename -s .ls \"$0\"`\".js;
         ';
 
-        echo Copying assets...;
+        echo \"\033[01;32mCopying assets...\033[00m\";
         find \\( -path './node_modules*' -o -path \"./$DEST/*\" \\) -prune -o -regextype posix-egrep -regex $ASSETS -print0
         | xargs -n1 -0 sh -c '
             mkdir -p \"$DEST/`dirname \"$0\"`\";
             cp -a \"$0\" \"$DEST/$0\"
         ';
 
-        echo Done!;
+        echo \"\033[01;32mDone!\033[00m\";
     "
     # restore the original situation
     postbuild: 'git stash pop --index && rm .create_stash;'
