@@ -39,9 +39,30 @@ export class Entity extends Table
         @item = model.ref('_page.item', 'item')         # the item being added or edited - parameter, thus not _page!
         @items = model.root.at(@entity.id)              # the list of entity instances to be displayed
 
-        model.ref '_page.items', @items.filter(null)    # make items available in the local model as a list with a null-filter
-
         @entitiesApi = EntitiesApi.instance!
+
+        # filter will need the additional input path _page.filter, which is the value
+        # of the search field the user enters his stuff into
+
+        #model.ref '_page.items', @items.filter(null)    # make items available in the local model as a list with a null-filter
+
+        entity = @entitiesApi.entity @entity.id     # get the version of entity with indexed attributes
+        @displayAttr = entity.attributes[entity.display.attribute]
+
+        sortFn = (itemA, itemB) ~>
+            itemAtext = EntitiesApi.instance!.renderAsText(itemA, @displayAttr)
+            itemBtext = EntitiesApi.instance!.renderAsText(itemB, @displayAttr)
+
+            if (itemAtext < itemBtext)
+                return -1;
+            if (itemAtext > itemBtext)
+                return 1;
+
+            return 0;
+
+
+        model.ref '_page.items', @items.sort(sortFn)
+
 
 
     /* Called after the view is rendered. It is possible to use jQuery in here.
