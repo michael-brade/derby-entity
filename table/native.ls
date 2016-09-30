@@ -2,9 +2,38 @@ export class Table
 
     table: -> 'native'
 
+    init: (model) ->
+        # filter will need the additional input path _page.filter, which is the value
+        # of the search field the user enters his stuff into
+
+        #model.ref '_page.items', @items.filter(null)    # make items available in the local model as a list with a null-filter
+
+        # default sorting: display attribute
+        entity = @entitiesApi.entity @entity.id     # get the version of entity with indexed attributes
+        @sortAttr = entity.attributes[entity.display.attribute]
+
+        @sortFn = (itemA, itemB) ~>
+            itemAtext = @entitiesApi.renderAsText(itemA, @sortAttr)
+            itemBtext = @entitiesApi.renderAsText(itemB, @sortAttr)
+
+            if (itemAtext < itemBtext)
+                return -1;
+            if (itemAtext > itemBtext)
+                return 1;
+
+            return 0;
+
+
+        model.ref '_page.items', @items.sort(@sortFn)
+
 
     create: (model, dom) ->
         require('jquery.highlight')
+
+
+    sortBy: (attr) ->
+        @sortAttr = attr
+        @model.ref '_page.items', @items.sort(@sortFn)
 
 
     select: (id) ->

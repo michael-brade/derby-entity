@@ -29,7 +29,8 @@ $fa-font-path: '/fonts/font-awesome';
 // native
 @import './table/native';
 
-// derby-entities-lib
+// derby-entities-lib - in here for the Api.render() functions (used by dataTables) since they don't add CSS,
+// only using the components adds CSS automatically.
 @import 'derby-entities-lib/types/color';
 @import 'derby-entities-lib/types/image';
 

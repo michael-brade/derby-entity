@@ -4,7 +4,9 @@
         <thead>
             <tr>
                 {{each entity.attributes as #col}}
-                    <th class="attr">{{t($locale, entity.id + '.' + #col.id)}}</th>
+                    <th class="attr" on-click="sortBy(#col)">
+                        {{t($locale, entity.id + '.' + #col.id)}}
+                    </th>
                 {{/each}}
 
                 <th class="actions">{{t($locale, 'actions.title')}}</th>

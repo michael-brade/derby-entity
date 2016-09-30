@@ -31,6 +31,7 @@ export class Entity extends Table
     entity: null
     entitiesApi: null
 
+
     # This is basically the CTOR. Called when the component is instantiated.
     init: (model) !->
         model.ref('$locale', model.root.at('$locale'))
@@ -41,27 +42,7 @@ export class Entity extends Table
 
         @entitiesApi = EntitiesApi.instance!
 
-        # filter will need the additional input path _page.filter, which is the value
-        # of the search field the user enters his stuff into
-
-        #model.ref '_page.items', @items.filter(null)    # make items available in the local model as a list with a null-filter
-
-        entity = @entitiesApi.entity @entity.id     # get the version of entity with indexed attributes
-        @displayAttr = entity.attributes[entity.display.attribute]
-
-        sortFn = (itemA, itemB) ~>
-            itemAtext = EntitiesApi.instance!.renderAsText(itemA, @displayAttr)
-            itemBtext = EntitiesApi.instance!.renderAsText(itemB, @displayAttr)
-
-            if (itemAtext < itemBtext)
-                return -1;
-            if (itemAtext > itemBtext)
-                return 1;
-
-            return 0;
-
-
-        model.ref '_page.items', @items.sort(sortFn)
+        super ...
 
 
 

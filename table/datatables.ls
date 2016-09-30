@@ -3,6 +3,10 @@ export class Table
     table: -> 'datatables'
 
 
+    init: (model) ->
+        model.ref '_page.items', @items.filter(null)    # make items available in the local model as a list with a null-filter
+
+
     create: (model, dom) ->
 
         require('datatables')
@@ -215,16 +219,6 @@ export class Table
 
                         attr = @entity.attributes[col - 1]
                         throw new Error("attribute #{col - 1} not found for #{@entity.id}!") if not attr
-
-                        # @setAttribute("attrData", data[attr.id])
-                        # @setAttribute("attr", attr)
-                        # @setAttribute("loc", @model.get("$locale.locale"))
-                        # view = @get attr.type
-
-                        # console.log locale
-                        # console.log view
-                        #view.get(@context)
-                        #return "string"
 
                         if type == 'display'
                             @entitiesApi.render(data, attr, api.cell(meta.row, col).node())
