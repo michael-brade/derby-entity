@@ -40,7 +40,7 @@ export class Entity extends Table
         @item = model.ref('_page.item', 'item')         # the item being added or edited - parameter, thus not _page!
         @items = model.root.at(@entity.id)              # the list of entity instances to be displayed
 
-        @entitiesApi = EntitiesApi.instance!
+        @entitiesApi = EntitiesApi.instance model
 
         super ...
 
