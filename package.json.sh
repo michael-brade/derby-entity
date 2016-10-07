@@ -2,7 +2,7 @@
 
 name: 'derby-entity'
 description: 'A Perfect DerbyJS CRUD Component'
-version: '1.1.1'
+version: '1.2.0'
 
 author:
     name: 'Michael Brade'
@@ -24,8 +24,7 @@ dependencies:
     'lodash': '4.x'
 
     # derby components
-    'derby-entities-lib': '1.1.x'
-    'derby-entity-select2': '1.0.x'
+    'derby-entities-lib': '1.2.x'
 
     'derby-ui-toast': '*'
     'd-comp-palette': '*'
@@ -37,8 +36,9 @@ peerDependencies:
 
 devDependencies:
     'livescript': '1.5.x'
-    'node-sass': '3.8.x'
+    'node-sass': '3.10.x'
     'uglify-js': '2.7.x'
+    'html-minifier': '3.x'
 
 scripts:
     ## building
@@ -48,24 +48,36 @@ scripts:
     prebuild: 'npm run clean; touch .create_stash && git stash save --include-untracked "npm build stash";'
 
     # build the distribution under dist: create directory structure, compile to JavaScript, uglify
+    # TODO: compile scss to dist/css
     build: "
         export DEST=dist;
-        export ASSETS='.*\.scss|.*\.html|./README\.md|./package\.json';
+        export SOURCES='*.ls';
+        export VIEWS='*.html';
+        export ASSETS='.*\.scss|./README\.md|./package\.json';
+        export IGNORE=\"./$DEST|./test|./node_modules\";
 
-        find -path './node_modules*' -prune -o -name '*.ls' -print0
-        | xargs -n1 -0 sh -c '
-            echo Compiling and minifying $0...;
-            DEST_PATH=\"$DEST/`dirname $0`\";
-            mkdir -p \"$DEST_PATH\";
-            lsc -cp \"$0\" | uglifyjs - -cm -o \"$DEST_PATH/`basename -s .ls \"$0\"`\".js;
-        ';
+        echo \"\033[01;32mCompiling and minifying...\033[00m\";
+        find -regextype posix-egrep -regex $IGNORE -prune -o -name \"$SOURCES\" -print0
+        | xargs -n1 -P8 -0 sh -c '
+            echo $0...;
+            mkdir -p \"$DEST/`dirname $0`\";
+            lsc -cp \"$0\" | uglifyjs - -cm -o \"$DEST/${0%.*}.js\"';
+
+        echo \"\033[01;32mMinifying views...\033[00m\";
+        find -regextype posix-egrep -regex $IGNORE -prune -o -name \"$VIEWS\" -print0
+        | xargs -n1 -P8 -0 sh -c '
+            echo \"$0 -> $DEST/$0\";
+            mkdir -p \"$DEST/`dirname $0`\";
+            html-minifier --config-file .html-minifierrc -o \"$DEST/$0\" \"$0\"'
+        | column -t -c 3;
 
         echo \"\033[01;32mCopying assets...\033[00m\";
-        find \\( -path './node_modules*' -o -path \"./$DEST/*\" \\) -prune -o -regextype posix-egrep -regex $ASSETS -print0
+        find -regextype posix-egrep -regex $IGNORE -prune -o -regex $ASSETS -print0
         | xargs -n1 -0 sh -c '
+            echo \"$0 -> $DEST/$0\";
             mkdir -p \"$DEST/`dirname \"$0\"`\";
-            cp -a \"$0\" \"$DEST/$0\"
-        ';
+            cp -a \"$0\" \"$DEST/$0\"'
+        | column -t -c 3;
 
         echo \"\033[01;32mDone!\033[00m\";
     "
@@ -78,13 +90,10 @@ scripts:
 
     test: "echo \"TODO: no tests specified yet\" && exit 1;"
 
-    ## publishing - run as "npm run publish"
-
-    prepublish: "npm run clean; npm run build;"
-    publish: "npm publish dist;"
+    ## publishing: run "npm run build; cd dist; npm publish"
 
 engines:
-    node: '4.x || 5.x'
+    node: '>= 4.x'
 
 license: 'MIT'
 

@@ -18,23 +18,21 @@ TODO
 
 `derby-entity` depends on the following packages:
 
-* **LiveScript**: this component is written in LiveScript, so add `require('livescript');` to your `server.js` and `liveify`
-  to browserify transforms
-
-* **[my Derby 0.6 fork](https://github.com/michael-brade/derby)** because I added
-    - support for LiveScript components
+* **[my DerbyJS fork](https://github.com/michael-brade/derby)** because I added
     - support for component styles
     - support for subcomponents
+    - support for components written using ES6 inheritance
 
-  all of which are needed for derby-entity. Also, this fork pulls in my additions to `racer`.
+  all of which are currently needed for `derby-entity`, `derby-entities-lib`, and `derby-select2`. Also, I merged
+  Racer's pull request [238](https://github.com/derbyjs/racer/pull/238) for much better performance.
+
+* **[derby-router](https://github.com/derbyparty/derby-router)**
+
 * **[derby-entities-lib](https://github.com/michael-brade/derby-entities-lib)**, which contains some purely model- and
-    entity-specific functions as well as view components that are needed and shared by derby-entity and derby-entity-visualization
+    entity-specific functions as well as view components that are needed and shared by `derby-entity` and `derby-entity-visualization`
 
-* **[derby-entity-select2](https://github.com/michael-brade/derby-entity-select2)**
-
-* **[derby-sass](https://github.com/michael-brade/derby-sass)** for being able to compile scss files on the fly... actually, a better way is to do it using gulp, see below.
-
-* **modal from [d-comp-palette](https://github.com/shuslav/d-comp-palette)**
+* **[derby-sass](https://github.com/michael-brade/derby-sass)** for being able to compile scss files on the fly...
+  actually, a better way is to do it using gulp, see below.
 
 * i18n: **derby-lang**, **[derby-lang-locale](https://github.com/michael-brade/derby-lang-locale)** and
   **[derby-locale](https://github.com/michael-brade/derby-locale)**, plus the following shortcuts:
@@ -148,9 +146,34 @@ uses:
     $brand-aux-1-med-light
 ```
 
-#### Compilation
+#### CSS Compilation
+
+I am not using a task runner anymore, I just call the shell commands directly. I used to have gulp but found it to be
+too much code and too many dependencies to download. Even though, jake seems to be a beautiful alternative should
+the build become more complex in the future.
+
+If you really want to use gulp, you can use something like the following code to compile the `scss`. Note that the sass
+call has to be sync, otherwise the includes get messed up and random errors occur. Also note that I was using `nconf`,
+replace those paths with whatever is correct for you.
 
 ```ls
+    require! {
+        lodash: _
+        fs
+        path
+        'node-sass'
+        gulp
+        'merge-stream': merge    # to be able to use several streams in one task
+    }
+
+    notify     = require 'gulp-notify'
+    plumber    = require 'gulp-plumber'
+    sass       = require 'gulp-sass'
+    prefix     = require 'gulp-autoprefixer'
+    cssmin     = require 'gulp-cssmin'
+    sourcemaps = require 'gulp-sourcemaps'
+
+
     # create CSS from Sass, autoprefix it to target 99% of web browsers, minifies it.
     gulp.task 'components:sass', ->
         streams = _.map componentsDirs, (dir) ->
@@ -213,4 +236,4 @@ uses:
 
 MIT
 
-Copyright (c) 2015 Michael Brade
+Copyright (c) 2015-2016 Michael Brade

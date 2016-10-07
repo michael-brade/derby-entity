@@ -1,0 +1,11 @@
+{
+    "collapseWhitespace": true,
+    "conservativeCollapse": false,
+    "removeComments": true,
+    "keepClosingSlash": true,
+
+    "ignoreCustomFragments": [
+        "<-?[\\S]*?:[\\s\\S]*?>"
+    ],
+    "trimCustomFragments": true
+}
