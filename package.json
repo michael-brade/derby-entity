@@ -1,7 +1,7 @@
 {
   "name": "derby-entity",
   "description": "A Perfect DerbyJS CRUD Component",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "author": {
     "name": "Michael Brade",
     "email": "brade@kde.org"
@@ -33,11 +33,12 @@
     "html-minifier": "3.x"
   },
   "scripts": {
-    "prebuild": "npm run clean; touch .create_stash && git stash save --include-untracked \"npm build stash\";",
+    "prebuild": "npm run clean;touch .create_stash && git stash save --include-untracked \"npm build stash\";npm test || { npm run postbuild; exit 1; };",
     "build": "export DEST=dist;export SOURCES='*.ls';export VIEWS='*.html';export ASSETS='.*.scss|./README.md|./package.json';export IGNORE=\"./$DEST|./test|./node_modules\";echo \"\u001b[01;32mCompiling and minifying...\u001b[00m\";find -regextype posix-egrep -regex $IGNORE -prune -o -name \"$SOURCES\" -print0| xargs -n1 -P8 -0 sh -c 'echo $0...;mkdir -p \"$DEST/`dirname $0`\";lsc -cp \"$0\" | uglifyjs - -cm -o \"$DEST/${0%.*}.js\"';echo \"\u001b[01;32mMinifying views...\u001b[00m\";find -regextype posix-egrep -regex $IGNORE -prune -o -name \"$VIEWS\" -print0| xargs -n1 -P8 -0 sh -c 'echo \"$0 -> $DEST/$0\";mkdir -p \"$DEST/`dirname $0`\";html-minifier --config-file .html-minifierrc -o \"$DEST/$0\" \"$0\"'| column -t -c 3;echo \"\u001b[01;32mCopying assets...\u001b[00m\";find -regextype posix-egrep -regex $IGNORE -prune -o -regex $ASSETS -print0| xargs -n1 -0 sh -c 'echo \"$0 -> $DEST/$0\";mkdir -p \"$DEST/`dirname \"$0\"`\";cp -a \"$0\" \"$DEST/$0\"'| column -t -c 3;echo \"\u001b[01;32mDone!\u001b[00m\";",
     "postbuild": "git stash pop --index && rm .create_stash;",
     "clean": "rm -rf dist;",
-    "test": "echo \"TODO: no tests specified yet\" && exit 1;"
+    "test": "echo \"TODO: no tests specified yet\";",
+    "release": "npm run build; cd dist; npm publish;"
   },
   "engines": {
     "node": ">= 4.x"

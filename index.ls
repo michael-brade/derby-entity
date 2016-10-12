@@ -1,6 +1,6 @@
 require! {
-    './table/datatables': { Table }
-    # './table/native': { Table }
+    # './table/datatables': { Table }
+    './table/native': { Table }
     'derby-entities-lib/api': EntitiesApi
     'derby-entities-lib/types': { supportedTypeComponents }
 }

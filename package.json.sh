@@ -2,7 +2,7 @@
 
 name: 'derby-entity'
 description: 'A Perfect DerbyJS CRUD Component'
-version: '1.2.0'
+version: '1.2.1'
 
 author:
     name: 'Michael Brade'
@@ -45,7 +45,11 @@ scripts:
 
     # make sure a stash will be created and stash everything not committed
     # beware: --all would be really correct, but it also removes node_modules, so use --include-untracked instead
-    prebuild: 'npm run clean; touch .create_stash && git stash save --include-untracked "npm build stash";'
+    prebuild: '
+        npm run clean;
+        touch .create_stash && git stash save --include-untracked "npm build stash";
+        npm test || { npm run postbuild; exit 1; };
+    '
 
     # build the distribution under dist: create directory structure, compile to JavaScript, uglify
     # TODO: compile scss to dist/css
@@ -88,9 +92,10 @@ scripts:
 
     ## testing
 
-    test: "echo \"TODO: no tests specified yet\" && exit 1;"
+    test: 'echo "TODO: no tests specified yet";'
 
-    ## publishing: run "npm run build; cd dist; npm publish"
+    ## publishing
+    release: "npm run build; cd dist; npm publish;"
 
 engines:
     node: '>= 4.x'
