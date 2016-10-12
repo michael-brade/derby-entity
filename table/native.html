@@ -18,14 +18,18 @@
                 <tr id="{{#item.id}}">
                     {{each entity.attributes as #attr}}
                         <td on-click="select(#item.id)">
-                            <view name="{{#attr.type}}" mode="html" item="{{#item}}" attr="{{#attr}}" />
+                            <view name="{{#attr.type}}" mode="html" item="{{#item}}" attr="{{#attr}}"/>
                         </td>
                     {{/each}}
 
                     <td>
-                        <span class="action-references" on-click="showReferences($event)"><i class="fa fa-external-link"></i></span>
+                        <span class="action-references" on-click="showReferences($event)">
+                            <i class="fa fa-external-link"></i>
+                        </span>
                         &nbsp;
-                        <span class="action-remove" on-click="showDeleteModal(#item)"><i class="fa fa-remove"></i></span>
+                        <span class="action-remove" on-click="showDeleteModal(#item)">
+                            <i class="fa fa-remove"></i>
+                        </span>
                     </td>
                 </tr>
             {{/each}}
