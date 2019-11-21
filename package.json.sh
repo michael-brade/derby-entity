@@ -30,15 +30,15 @@ dependencies:
     'd-comp-palette': '*'
 
 peerDependencies:
-    'derby': 'michael-brade/derby'
+    'derby': '0.10.x'
     'derby-router': '*'
 
 
 devDependencies:
-    'livescript': '1.5.x'
-    'node-sass': '3.10.x'
-    'uglify-js': '2.7.x'
-    'html-minifier': '3.x'
+    'livescript': '1.6.x'
+    'node-sass': '4.13.x'
+    'uglify-js': '3.6.x'
+    'html-minifier': '4.x'
 
 scripts:
     ## building
@@ -65,7 +65,7 @@ scripts:
         | xargs -n1 -P8 -0 sh -c '
             echo $0...;
             mkdir -p \"$DEST/`dirname $0`\";
-            lsc -cp \"$0\" | uglifyjs - -cm -o \"$DEST/${0%.*}.js\"';
+            lsc -cp \"$0\" | uglifyjs -cm -o \"$DEST/${0%.*}.js\"';
 
         echo \"\033[01;32mMinifying views...\033[00m\";
         find -regextype posix-egrep -regex $IGNORE -prune -o -name \"$VIEWS\" -print0
