@@ -19,14 +19,15 @@ require! {
 export class Entity extends Table
 
     # public instance members
-    name: 'entity'
-    view: __dirname
-    style: __dirname
 
-    components: [
-        require 'd-comp-palette/modal/modal'
-        require 'derby-entities-lib/item/item' .Item
-    ] ++ supportedTypeComponents
+    @view =
+        is: 'entity'
+        file: __dirname
+        style: __dirname
+        dependencies: [
+            ['entity:modal', require 'd-comp-palette/modal/modal']
+            ['entity:item', require 'derby-entities-lib/item/item' .Item]
+        ] ++ supportedTypeComponents.map (ctor) -> [ 'entity:' + ctor.view.is, ctor ]
 
     entity: null
     entitiesApi: null

@@ -30,7 +30,7 @@ dependencies:
     'd-comp-palette': '*'
 
 peerDependencies:
-    'derby': '0.10.x'
+    'derby': 'michael-brade/derby'
     'derby-router': '*'
 
 

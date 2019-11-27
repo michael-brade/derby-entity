@@ -1,4 +1,8 @@
-export class Table
+require! {
+    derby: { Component }
+}
+
+export class Table extends Component
 
     table: -> 'native'
 

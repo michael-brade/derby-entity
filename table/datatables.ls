@@ -1,7 +1,10 @@
-export class Table
+require! {
+    derby: { Component }
+}
+
+export class Table extends Component
 
     table: -> 'datatables'
-
 
     init: (model) ->
         model.ref '_page.items', @items.filter(null)    # make items available in the local model as a list with a null-filter
