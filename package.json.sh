@@ -22,6 +22,11 @@ repository:
 dependencies:
     # utils
     'lodash': '4.x'
+    'jquery': '3.x'
+    'jquery-highlight': '3.5.x'
+
+    'font-awesome': '4.x'
+    'compass-mixins': '*'
 
     # derby components
     'derby-entities-lib': '1.2.x'
@@ -35,10 +40,13 @@ peerDependencies:
 
 
 devDependencies:
+    'bootstrap-sass': '3.4.x'
+    'sass': '1.23.x'
+
     'livescript': '1.6.x'
-    'node-sass': '4.13.x'
     'uglify-js': '3.6.x'
     'html-minifier': '4.x'
+    'browserify': '16.x'
 
 scripts:
     ## building
@@ -52,13 +60,12 @@ scripts:
     '
 
     # build the distribution under dist: create directory structure, compile to JavaScript, uglify
-    # TODO: compile scss to dist/css
     build: "
         export DEST=dist;
         export SOURCES='*.ls';
         export VIEWS='*.html';
         export ASSETS='.*\.scss|./README\.md|./package\.json';
-        export IGNORE=\"./$DEST|./test|./node_modules\";
+        export IGNORE=\"./$DEST|./test|./node_modules|./docs\";
 
         echo \"\033[01;32mCompiling and minifying...\033[00m\";
         find -regextype posix-egrep -regex $IGNORE -prune -o -name \"$SOURCES\" -print0
@@ -75,6 +82,8 @@ scripts:
             html-minifier --config-file .html-minifierrc -o \"$DEST/$0\" \"$0\"'
         | column -t -c 3;
 
+        sass -I node_modules -I node_modules/compass-mixins/lib -I node_modules/bootstrap-sass/assets/stylesheets index.scss -s compressed --no-source-map $DEST/index.css;
+
         echo \"\033[01;32mCopying assets...\033[00m\";
         find -regextype posix-egrep -regex $IGNORE -prune -o -regex $ASSETS -print0
         | xargs -n1 -0 sh -c '
@@ -89,6 +98,16 @@ scripts:
     postbuild: 'git stash pop --index && rm .create_stash;'
 
     clean: "rm -rf dist;"   # the ; at the end is very important! otherwise "npm run clean ." would delete everything
+
+    ## docs
+
+    docs: "
+        npm run build;
+        export DEST=docs;
+        node $DEST/build.js;
+        cd dist; browserify -s Entity index.js -o ../$DEST/js/entity.js; cd ..;
+        cp dist/index.css $DEST/css/index.css;
+    "
 
     ## testing
 

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>DerbyJS Entity Demo</title>
+
+    <script src="js/jquery.js"></script>
+    <script src="js/derby-standalone.js"></script>
+    <script src="js/entity.js"></script>
+
+    <link type="text/css" rel="stylesheet" href="css/index.css">
+</head>
+
+<body>
+    <script id="entity-demo.html" type="text/template">
+        <Body:>
+            <div class="container">
+                <div class="row">
+                </div>
+            </div>
+    </script>
+
+
+
+    <script>
+        // create the Derby app
+        var app = derby.createApp()
+
+        // Load templates from id
+        app.loadViews('entity-demo.html')
+        app.component(Entity.Entity)
+
+        // create the page
+        var page = app.createPage()
+
+        page.model.set("_page.items", [
+            { id: 1, text: "first item" },
+            { id: 2, text: "second item" },
+            { id: 3, text: "third item" },
+            { id: 4, text: "fourth item" },
+        ])
+
+
+
+        // Append the rendered template to the document. It could be inserted in any DOM location
+        document.body.appendChild(page.getFragment('Body'))
+    </script>
+
+</body>
+
+</html>

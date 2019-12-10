@@ -32,7 +32,7 @@ export class Table extends Component
 
 
     create: (model, dom) ->
-        require('jquery.highlight')
+        require('jquery-highlight/jquery.highlight')
 
 
     sortBy: (attr) ->
