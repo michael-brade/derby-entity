@@ -1,4 +1,5 @@
 require! {
+    path
     # './table/datatables': { Table }
     './table/native': { Table }
     'derby-entities-lib/api': EntitiesApi
@@ -22,8 +23,8 @@ export class Entity extends Table
 
     @view =
         is: 'entity'
-        file: __dirname
-        style: __dirname
+        file: path.join __dirname, 'entity'
+        style: path.join __dirname, 'entity'
         dependencies: [
             ['entity:modal', require 'd-comp-palette/modal/modal']
             ['entity:item', require 'derby-entities-lib/item/item' .Item]

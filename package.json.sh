@@ -14,6 +14,8 @@ keywords:
     'crud'
     'table'
 
+main:
+    'entity.js'
 
 repository:
     type: 'git'
@@ -82,7 +84,7 @@ scripts:
             html-minifier --config-file .html-minifierrc -o \"$DEST/$0\" \"$0\"'
         | column -t -c 3;
 
-        sass -I node_modules -I node_modules/compass-mixins/lib -I node_modules/bootstrap-sass/assets/stylesheets index.scss -s compressed --no-source-map $DEST/index.css;
+        sass -I node_modules -I node_modules/compass-mixins/lib -I node_modules/bootstrap-sass/assets/stylesheets entity.scss -s compressed --no-source-map $DEST/entity.css;
 
         echo \"\033[01;32mCopying assets...\033[00m\";
         find -regextype posix-egrep -regex $IGNORE -prune -o -regex $ASSETS -print0
@@ -105,8 +107,11 @@ scripts:
         npm run build;
         export DEST=docs;
         node $DEST/build.js;
-        cd dist; browserify -s Entity index.js -o ../$DEST/js/entity.js; cd ..;
-        cp dist/index.css $DEST/css/index.css;
+        cd dist; browserify -s Entity entity.js -o ../$DEST/js/entity.js; cd ..;
+        cp dist/entity.css $DEST/css/entity.css;
+        cp dist/entity.html dist/dialogs.html $DEST;
+        mkdir $DEST/table;
+        cp dist/table/native.html dist/table/datatables.html $DEST/table;
     "
 
     ## testing
