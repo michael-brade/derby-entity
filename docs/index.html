@@ -15,10 +15,17 @@
 
 <body>
     <script id="entity-demo.html" type="text/template">
+        <TitleElement:>
+            <title>DerbyJS Entity Demo</title>
+
+        <BodyElement:>
+            <body class="{{$bodyClass($render.ns)}}">
+                <view is="{{$render.prefix}}Body"></view>
+
         <Body:>
             <div class="container-fluid">
                 <div class="page-header">
-                    <h1>Derby Entity Demo</h1>
+                    <h1>DerbyJS Entity Demo</h1>
                 </div>
 
                 <!-- <view name="{{$render.ns}}" /> -->
@@ -58,6 +65,8 @@
 
 
     <script>
+        derby.Model.prototype._isLocal = function() { return true; }
+
         EntitiesApi = require('derby-entities-lib/api')
 
         // create the Derby app
