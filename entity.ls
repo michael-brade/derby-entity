@@ -4,6 +4,8 @@ require! {
     './table/native': { Table }
     'derby-entities-lib/api': EntitiesApi
     'derby-entities-lib/types': { supportedTypeComponents }
+    'bootstrap-sass/assets/javascripts/bootstrap/tooltip.js'
+    'bootstrap-sass/assets/javascripts/bootstrap/popover.js'
 }
 
 # Display one entity with a table listing all instances and
@@ -19,7 +21,7 @@ require! {
 # In the view just "entity" is enough to access them.
 export class Entity extends Table
 
-    # public instance members
+    # public static members
 
     @view =
         is: 'entity'
@@ -30,15 +32,18 @@ export class Entity extends Table
             ['entity:item', require 'derby-entities-lib/item/item' .Item]
         ] ++ supportedTypeComponents.map (ctor) -> [ 'entity:' + ctor.view.is, ctor ]
 
+
+    # public instance members
+
     entity: null
     entitiesApi: null
 
 
     # This is basically the CTOR. Called when the component is instantiated.
     init: (model) !->
-        model.ref('$locale', model.root.at('$locale'))
+        model.ref('$locale', model.root.at '$locale')
 
-        @entity = @getAttribute("entity")
+        @entity = model.get('entity')
         @item = model.ref('_page.item', 'item')         # the item being added or edited - parameter, thus not _page!
         @items = model.root.at(@entity.id)              # the list of entity instances to be displayed
 
