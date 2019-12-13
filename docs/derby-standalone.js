@@ -2,10 +2,13 @@
 var parsing = require('derby/parsing');
 var path = require('path');
 var DerbyStandalone = require('derby/lib/DerbyStandalone');
+var Router = require('derby-router')
 var derby = new DerbyStandalone();
 var App = derby.App;
 
 global.derby = module.exports = derby;
+
+derby.Router = Router;
 
 App.prototype.getTemplate = function(filename) {
     var el = document.getElementById(filename);

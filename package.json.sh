@@ -107,10 +107,10 @@ scripts:
         npm run build;
         export DEST=docs;
         node $DEST/build.js;
-        cd dist; browserify -s Entity entity.js -o ../$DEST/js/entity.js; cd ..;
+        browserify -r derby-entities-lib/api -r ./dist/entity.js:derby-entity -o $DEST/js/entity.js;
         cp dist/entity.css $DEST/css/entity.css;
         cp dist/entity.html dist/dialogs.html $DEST;
-        mkdir $DEST/table;
+        mkdir -p $DEST/table;
         cp dist/table/native.html dist/table/datatables.html $DEST/table;
     "
 

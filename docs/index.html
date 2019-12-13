@@ -16,32 +16,140 @@
 <body>
     <script id="entity-demo.html" type="text/template">
         <Body:>
-            <div class="container">
-                <div class="row">
+            <div class="container-fluid">
+                <div class="page-header">
+                    <h1>Derby Entity Demo</h1>
                 </div>
+
+                <!-- <view name="{{$render.ns}}" /> -->
+                <view name="editor" />
+            </div>
+
+        <editor:>
+            <div class="row">
+                <div class="col-md-2">
+                    <view name="navpills" items="{{_page.entities}}"/>
+                </div>
+
+                <div class="col-md-10">
+                    {{if _page.entity}}
+                        <view name="entity" entity="{{_page.entity}}" item="{{_page.item}}" />
+                    {{else}}
+                        <div>Please select a type of information.</div>
+                    {{/}}
+                </div>
+            </div>
+
+
+        <navpills:>
+            <div class="navigation">
+                <ul class="nav nav-pills nav-stacked">
+                    {{each @items as #item}}
+                        {{if currentLink(#root.$render.url, pathFor(#item.id))}}
+                            <li class="active"><a>{{t($locale, #item.id + ".title")}}</a></li>
+                        {{else}}
+                            <li><a href="{{pathFor(#item.id)}}">{{t($locale, #item.id + ".title")}}</a></li>
+                        {{/if}}
+                    {{/each}}
+                </ul>
             </div>
     </script>
 
 
 
     <script>
+        EntitiesApi = require('derby-entities-lib/api')
+
         // create the Derby app
         var app = derby.createApp()
+        var page = app.page
+
+        app.use(derby.Router)
+
+        app.prefix = '/docs'
 
         // Load templates from id
         app.loadViews('entity-demo.html')
-        app.component(Entity.Entity)
+        app.component(require('derby-entity').Entity)
 
-        // create the page
-        var page = app.createPage()
 
-        page.model.set("_page.items", [
-            { id: 1, text: "first item" },
-            { id: 2, text: "second item" },
-            { id: 3, text: "third item" },
-            { id: 4, text: "fourth item" },
-        ])
+        // kind of static method
 
+        app.proto.currentLink = function(currentUrl, link) {
+            console.log(currentUrl, link)
+            if (!currentUrl) return false
+            return currentUrl.search(link) == 0
+        }
+
+        app.proto.t = function(locale, id) {
+            return id
+        }
+
+
+        var entities = [
+            {
+                id: 'people',
+                attributes: [
+                    {
+                        id: 'name'
+                    }, {
+                        id: 'description',
+                        type: 'textarea',
+                        i18n: true
+                    }
+                ]
+            }, {
+                id: 'company',
+                attributes: [
+                    {
+                        id: 'name'
+                    }, {
+                        id: 'employees',
+                        type: 'entity',
+                        entity: 'people',
+                        multi: true,
+                        uniq: false,
+                        reference: true
+                    }
+                ]
+            }
+        ];
+
+
+        EntitiesApi.init(page.model, entities)
+
+        page.model.set("_page.entities", entities)
+
+
+        // routes
+        app.get(app.prefix, /*['useri18n'],*/ (page, model, params, next) => {
+            page.render("editor");
+        })
+
+
+        entities.forEach(function(entity) {
+            var routeName = entity.id;
+            var routePath = app.prefix + '/' + entity.id + "/:id?";
+
+            app.get(routeName, routePath, /*['useri18n'],*/ (page, model, params, next) => {
+                if (!/^[a-zA-Z0-9_-]+$/.test(params.id)) {
+                    return next();
+                }
+                return model.subscribe(EntitiesApi.queryDependentEntities(model, entity), err => {
+                    if (err) {
+                        return next(err);
+                    }
+                    model.set("_page.entity", entity);
+                    if (params.id) {
+                        model.ref('_page.item', model.at(entity.id + '.' + params.id));
+                    } else {
+                        model.removeRef('_page.item');
+                    }
+
+                    return page.render("editor");
+                });
+            });
+        });
 
 
         // Append the rendered template to the document. It could be inserted in any DOM location
