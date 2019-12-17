@@ -6,6 +6,8 @@ var Router = require('derby-router')
 var derby = new DerbyStandalone();
 var App = derby.App;
 
+window.jQuery = window.$ = require('jquery');
+
 global.derby = module.exports = derby;
 
 derby.Router = Router;
