@@ -49,6 +49,7 @@ devDependencies:
     'uglify-js': '3.6.x'
     'html-minifier': '4.x'
     'browserify': '16.x'
+    'browserify-livescript': '0.2.x'
 
 scripts:
     ## building
@@ -107,7 +108,7 @@ scripts:
         npm run build;
         export DEST=docs;
         node $DEST/build.js;
-        browserify -r derby-entities-lib/api -r ./dist/entity.js:derby-entity -o $DEST/js/entity.js;
+        browserify -r derby-entities-lib/api -r ./dist/entity.js:derby-entity -r ./$DEST/i18n.ls:i18n -t browserify-livescript -o $DEST/js/entity.js;
         cp dist/entity.css $DEST/css/entity.css;
         cp dist/entity.html dist/dialogs.html $DEST;
         mkdir -p $DEST/table;

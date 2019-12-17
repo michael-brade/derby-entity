@@ -7,6 +7,7 @@
 
     <script src="js/derby-standalone.js"></script>
     <script src="js/entity.js"></script>
+    <script src="js/dropdown.js"></script>
 
     <!-- TODO: derby-standalone should load component styles, too! -->
     <link type="text/css" rel="stylesheet" href="css/entity.css">
@@ -18,15 +19,45 @@
             <title>DerbyJS Entity Demo</title>
 
         <BodyElement:>
-            <body class="{{$bodyClass($render.ns)}}">
+            <body class="{{$bodyClass($render.ns)}}" style="padding-top: 70px">
                 <view is="{{$render.prefix}}Body"></view>
 
-        <Body:>
-            <div class="container-fluid">
-                <div class="page-header">
-                    <h1>DerbyJS Entity Demo</h1>
-                </div>
+        <header:>
+            <!-- <view name="derby-ui-toast" /> -->
 
+            <nav class="navbar navbar-inverse navbar-fixed-top">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <a class="navbar-brand" href="#">DerbyJS Entity Demo</a>
+                    </div>
+
+                    <div class="collapse navbar-collapse">
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+                                    <span class="flag-icon flag-icon-{{$locale.locale}}"></span>
+                                    {{$locale.locale}}
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu" role="menu">
+                                    {{each $locale.supported as #loc}}
+                                        <li><a on-click="setLocale(#loc)">
+                                            <span class="flag-icon flag-icon-{{#loc}}"></span>
+                                            {{t($locale, ['locales', #loc])}}
+                                        </a></li>
+                                    {{/each}}
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+
+
+        <Body:>
+            <view name="header" />
+
+            <div class="container-fluid">
                 <!-- <view name="{{$render.ns}}" /> -->
                 <view name="editor" />
             </div>
@@ -66,13 +97,15 @@
     <script>
         derby.Model.prototype._isLocal = function() { return true; }
 
-        EntitiesApi = require('derby-entities-lib/api')
+        var EntitiesApi = require('derby-entities-lib/api')
+        var i18n = require('i18n')
 
         // create the Derby app
         var app = derby.createApp()
         var page = app.page
 
         app.use(derby.Router)
+        i18n.apply(app)
 
         app.prefix = '/docs'
 
@@ -89,10 +122,6 @@
             return currentUrl.search(link) == 0
         }
 
-        app.proto.t = function(locale, id) {
-            return id
-        }
-
 
         var entities = [
             {
@@ -107,7 +136,7 @@
                     }
                 ]
             }, {
-                id: 'company',
+                id: 'companies',
                 attributes: [
                     {
                         id: 'name'
@@ -123,14 +152,130 @@
             }
         ];
 
+        var de = {
+            // entity translations
+
+            "people": {
+                "title": "Personen",
+                "one":   "Person",
+
+                "name": "Name"
+            },
+
+            "companies": {
+                "title": "Firmen",
+                "one":   "Firma",
+
+                "name": "Name"
+            },
+
+            // dialogs, actions, etc.
+
+            "author": "Michael Brade",
+            "year": "2014-2019",
+            "copyright": "© 2014-2016, 2019 Michael Brade",
+
+            "locales": {
+                "de": "Deutsch",
+                "en": "Englisch"
+            },
+
+            "actions": {
+                "title": "Aktionen",
+
+                "new": "Neu: {ITEM}",
+                "edit": "Bearbeiten",
+                "add": "Hinzufügen",
+                "delete": "Löschen",
+                "done": "Fertig",
+                "cancel": "Abbruch",
+
+                "removeImage": "Bild löschen"
+            },
+
+            "dialogs": {
+                "deleteEntityTitle": "{ENTITY} löschen",
+
+                "referencePopoverTitle": "<em>{ITEM}</em> wird verwendet von:",
+                "referencePopoverUnused": "{ENTITY} wird nicht referenziert."
+            },
+
+            "messages": {
+                "entityAdded": "{ENTITY} \"{ITEM}\" hinzugefügt.",
+                "deleteEntity": "Soll diese(s) {ENTITY} wirklich gelöscht werden?",
+                "entityDeleted": "{ENTITY} \"{ITEM}\" gelöscht.",
+                "itemReferenced": "Kann {ENTITY} nicht löschen, da es noch Verwender gibt:"
+            }
+        }
+
+        var en = {
+            // entity translations
+
+            "people": {
+                "title": "People",
+                "one":   "Person",
+
+                "name": "Name"
+            },
+
+            "companies": {
+                "title": "Companies",
+                "one":   "Company",
+
+                "name": "Name"
+            },
+
+            // dialogs, actions, etc.
+
+            "author": "Michael Brade",
+            "year": "2014-2019",
+            "copyright": "© 2014-2016, 2019 Michael Brade",
+
+            "locales": {
+                "de": "German",
+                "en": "English"
+            },
+
+            "actions": {
+                "title": "Actions",
+
+                "new": "New {ITEM}",
+                "edit": "Edit",
+                "add": "Add",
+                "delete": "Delete",
+                "done": "Done",
+                "cancel": "Cancel",
+
+                "removeImage": "Remove image"
+            },
+
+            "dialogs": {
+                "deleteEntityTitle": "Delete {ENTITY}",
+
+                "referencePopoverTitle": "<em>{ITEM}</em> is used by:",
+                "referencePopoverUnused": "This {ENTITY} is not referenced."
+            },
+
+            "messages": {
+                "entityAdded": "New {ENTITY} \"{ITEM}\" added.",
+                "deleteEntity": "Do you really want to delete this {ENTITY}?",
+                "entityDeleted": "{ENTITY} \"{ITEM}\" deleted.",
+                "itemReferenced": "Cannot delete {ENTITY} because it is still referenced by:"
+            }
+        }
+
 
         EntitiesApi.init(page.model, entities)
 
         page.model.set("_page.entities", entities)
+        page.model.set("$lang.dict.strings.en", en)
+        page.model.set("$lang.dict.strings.de", de)
+        page.model.set("$locale.supported", ['en', 'de'])
+        page.model.set("_page.user.local.locales", ['en'])
 
 
         // routes
-        app.get(app.prefix, /*['useri18n'],*/ (page, model, params, next) => {
+        app.get(app.prefix, ['useri18n'], (page, model, params, next) => {
             page.render("editor");
         })
 
@@ -139,7 +284,7 @@
             var routeName = entity.id;
             var routePath = app.prefix + '/' + entity.id + "/:id?";
 
-            app.get(routeName, routePath, /*['useri18n'],*/ (page, model, params, next) => {
+            app.get(routeName, routePath, ['useri18n'], (page, model, params, next) => {
                 if (!/^[a-zA-Z0-9_-]+$/.test(params.id)) {
                     return next();
                 }
