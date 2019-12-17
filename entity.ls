@@ -4,8 +4,6 @@ require! {
     './table/native': { Table }
     'derby-entities-lib/api': EntitiesApi
     'derby-entities-lib/types': { supportedTypeComponents }
-    'bootstrap-sass/assets/javascripts/bootstrap/tooltip.js'
-    'bootstrap-sass/assets/javascripts/bootstrap/popover.js'
 }
 
 # Display one entity with a table listing all instances and
@@ -72,6 +70,9 @@ export class Entity extends Table
      */
     create: (model, dom) ->
         super ...
+        
+        require 'bootstrap-sass/assets/javascripts/bootstrap/tooltip.js'
+        require 'bootstrap-sass/assets/javascripts/bootstrap/popover.js'
 
         #dom.on 'keydown', (e) ~>   # this registers several dom listeners
 
